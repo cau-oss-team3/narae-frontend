@@ -1,103 +1,41 @@
-<script context="module">
-	import { FakeWebSocketServer } from '$lib/FakeWebSocketServer';
-</script>
-
 <script>
-	import { onDestroy, onMount } from 'svelte';
+    import { onDestroy } from 'svelte';
+    import {userData} from "../stores.js";
+    import {goto} from "$app/navigation";
+    import {Button, Container} from "@sveltestrap/sveltestrap";
 
-	/**
-	 * @type {any[]}
-	 */
-	let messages = [];
-	let inputMessage = '';
-	/**
-	 * @type {FakeWebSocketServer}
-	 */
-	let fakeServer = new FakeWebSocketServer();
+    let userDataValue;
 
-	// Function to add a new message to the chat
-	/**
-	 * @param {{ text: string; sender: string; }} message
-	 */
-	function addMessage(message) {
-		messages = [...messages, message];
-	}
+    const unsubscribe = userData.subscribe(value => {
+        userDataValue = value;
+    });
 
-	// Function to send a message
-	function sendMessage() {
-		if (inputMessage.trim() !== '') {
-			addMessage({ text: inputMessage, sender: 'You' });
-			inputMessage = '';
+    onDestroy(unsubscribe);
 
-			// Simulate sending message to the server (in real scenario, this would be WebSocket communication)
-			setTimeout(() => {
-				const randomMessage = fakeServer.generateRandomMessage();
-				addMessage({ text: randomMessage, sender: 'Server' });
-			}, 500);
-		}
-	}
-
-	onMount(() => {
-		// Initialize fake server
-		fakeServer.start();
-	});
-
-	onDestroy(() => {
-		// Clean up fake server
-		fakeServer.stop();
-	});
+    const redirect = () => {
+        if (userDataValue != null) {
+            goto('/mentors'); //멘토 리스트 페이지로 넘겨줌
+        } else {
+            goto('/auth'); //로그인 페이지로 넘겨줌
+        }
+    };
 </script>
 
-<h1>Welcome to Narae Mentoring</h1>
+<Container class="py-5 h-100 text-center container-fluid">
+    <h1 class="container">Narae: Your Personal AI Mentor</h1>
 
-<div class="chat-container">
-	{#each messages as message, index}
-		<div class="message" class:own-message={message.sender === 'You'}>
-			<span class="sender">{message.sender}:</span>
-			<span class="text">{message.text}</span>
-		</div>
-	{/each}
-</div>
-
-<div class="input-container">
-	<input type="text" bind:value={inputMessage} placeholder="Type your message..." />
-	<button on:click={sendMessage}>Send</button>
-</div>
-
-<style>
-	.chat-container {
-		margin-bottom: 20px;
-		overflow-y: scroll;
-		height: 300px;
-	}
-
-	.message {
-		margin-bottom: 10px;
-	}
-
-	.own-message {
-		text-align: right;
-	}
-
-	.sender {
-		font-weight: bold;
-		margin-right: 5px;
-	}
-
-	.input-container {
-		display: flex;
-	}
-
-	input[type='text'] {
-		flex: 1;
-		margin-right: 10px;
-	}
-
-	button {
-		padding: 5px 10px;
-		background-color: #007bff;
-		color: #fff;
-		border: none;
-		cursor: pointer;
-	}
-</style>
+    <Button
+            class=""
+            active={false}
+            block={false}
+            children=""
+            close={false}
+            color="primary"
+            disabled={false}
+            href=""
+            outline={false}
+            size="md"
+            style="margin-top: 50px;"
+            on:click={redirect}
+            value="">서비스 사용해보기</Button>
+</Container>

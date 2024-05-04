@@ -8,7 +8,7 @@
     let validated = false;
     let values = {};
 
-    // 로그아웃
+    // 로그인
     async function doLogin () {
         const data = {
             email:values.email,
@@ -30,7 +30,7 @@
             goto('/mentors'); //멘토 리스트 페이지로 넘겨줌
 
         } else {
-            alertData.set({code:json.status, err:json.err});
+            alertData.set({code:res.status, err:json.err});
         }
     }
 </script>

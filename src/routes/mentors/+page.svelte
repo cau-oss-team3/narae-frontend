@@ -21,6 +21,7 @@
     let mentors = [];
 
     //TODO 삭제
+    /*
     let dummyMentors = [
         {
             "id": "mentorid1",
@@ -33,6 +34,8 @@
             "daily_action": "오늘의 할일 2"
         }
     ];
+
+     */
 
     onMount(() => {
         // Initialize fake server
@@ -52,8 +55,13 @@
         const json = await res.json()
 
         if (json.isSuccess) {
-            open = Array.from({length: dummyMentors.length}, () => false); //TODO json.mentors.length 로 변경
-            mentors = dummyMentors; //TODO json.mentors 로 변경
+            /* TODO 삭제
+            open = Array.from({length: dummyMentors.length}, () => false);
+            mentors = dummyMentors;
+             */
+
+            open = Array.from({length: json.mentors.length}, () => false);
+            mentors = json.mentors;
         } else {
             alertData.set({code:res.status, err:json.err});
         }
@@ -62,7 +70,7 @@
     // chat 페이지로 보내기
     const goToChat = (id) => {
         if (id != null) {
-            goto('/chat'); //chat 페이지로 넘겨줌
+            goto('/chat?id='+id); //chat 페이지로 넘겨줌
         }
     }
 
@@ -174,7 +182,7 @@
         <br>
     {/each}
 
-    <Container fluid class="d-flex justify-content-end" style="margin-bottom: 30px;">
+    <Container fluid class="d-flex justify-content-end" style="margin-top: 30px; margin-bottom: 30px;">
         <Button
                 class=""
                 active={false}

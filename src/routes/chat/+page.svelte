@@ -6,7 +6,7 @@
     import {alertData, userData} from "../../stores.js";
     import {goto} from "$app/navigation";
 
-    const id = $page.url.searchParams.get("id"); // 다른 페이지에서 파라미터로 넘겨주는 멘토 ID임
+    const id = $page.url.searchParams.get("id"); // 다른 페이지에서 파라미터로 넘어오는 멘토 ID임
 
     let mentor_detail = null;
     let chat_history = [];

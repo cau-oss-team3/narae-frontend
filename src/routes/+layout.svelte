@@ -95,7 +95,7 @@
                     {#if userDataValue != null}
                         <DropdownItem>{userDataValue.email}</DropdownItem>
                         <DropdownItem divider />
-                        <DropdownItem on:click={doLogout}>Logout</DropdownItem>
+                        <DropdownItem on:click={() => doLogout()}>Logout</DropdownItem>
                     {:else}
                         <DropdownItem href="auth/">Login</DropdownItem>
                     {/if}

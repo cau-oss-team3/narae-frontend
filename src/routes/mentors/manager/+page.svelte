@@ -187,7 +187,7 @@
 </script>
 <Container class="py-5 h-100">
     <Row class="d-flex">
-        <Card class="shadow-2-strong" style="border-radius: 1rem;">
+        <Card class="shadow-2-strong" style="border-radius: 1rem; margin-bottom: 30px;">
             <CardBody class="p-5 text-center">
 
                 <h3 class="mb-5"><b>{id != null? "멘토 정보 수정" : "멘토 생성"}</b></h3>

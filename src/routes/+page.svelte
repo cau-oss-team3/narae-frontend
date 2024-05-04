@@ -21,7 +21,7 @@
     };
 </script>
 
-<Container class="py-5 h-100 text-center container-fluid">
+<Container class="py-5 text-center container-fluid">
     <h1 class="container">Narae: Your Personal AI Mentor</h1>
 
     <Button

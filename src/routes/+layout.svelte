@@ -1,8 +1,8 @@
 <script>
     import {
-        Alert,
+        Alert, Button,
         Collapse,
-        Dropdown, DropdownItem, DropdownMenu, DropdownToggle,
+        Dropdown, DropdownItem, DropdownMenu, DropdownToggle, Modal, ModalBody, ModalFooter, ModalHeader,
         Nav,
         Navbar,
         NavbarBrand,
@@ -19,6 +19,11 @@
     let alertDataValue;
     let isOpen;
     let handleUpdate;
+    let open = false;
+
+    const toggle = () => {
+        open = !open;
+    };
 
     const unsubscribeUserData = userData.subscribe(value => {
         userDataValue = value;
@@ -26,6 +31,7 @@
 
     const unsubscribeAlertData = alertData.subscribe(value => {
         alertDataValue = value;
+        open = alertDataValue != null;
     });
 
     afterNavigate(() => {
@@ -37,7 +43,7 @@
         unsubscribeAlertData;
     });
 
-    // 로그인
+    // 로그아웃
     async function doLogout () {
         if (userDataValue != null) {
             const res = await fetch(PUBLIC_API_SERVER + '/auth/logout', {
@@ -55,7 +61,7 @@
                 goto('/'); //메인 페이지로 넘겨줌
 
             } else {
-                alertData.set({code: json.status, err: json.err});
+                alertData.set({code:res.status, err: json.err});
             }
         }
     }
@@ -78,7 +84,7 @@
     <Collapse {isOpen} navbar expand="md" on:update={handleUpdate}>
         <Nav class="ms-auto" navbar>
             <NavItem>
-                <NavLink href="test/">테스트</NavLink> <!-- TODO 배포전 삭제 -->
+                <NavLink href="/test">테스트</NavLink> <!-- TODO 배포전 삭제 -->
             </NavItem>
             <NavItem>
                 <NavLink href="https://github.com/cau-oss-team3">GitHub</NavLink>
@@ -89,7 +95,7 @@
                     {#if userDataValue != null}
                         <DropdownItem>{userDataValue.email}</DropdownItem>
                         <DropdownItem divider />
-                        <DropdownItem on:click={doLogout}>Logout</DropdownItem>
+                        <DropdownItem on:click={() => doLogout()}>Logout</DropdownItem>
                     {:else}
                         <DropdownItem href="auth/">Login</DropdownItem>
                     {/if}
@@ -98,33 +104,23 @@
         </Nav>
     </Collapse>
 </Navbar>
-
-{#if alertDataValue != null}
-    {#if alertDataValue.code === 500}
+<Modal isOpen={open} {toggle}>
+    <ModalHeader {toggle}>알림</ModalHeader>
+    <ModalBody>
         <Alert
-                class=""
-                children="{alertDataValue.err}"
-                color="danger"
-                closeClassName=""
-                closeAriaLabel="Close"
-                dismissible
-                fade
-                heading="Error"
-                isOpen
-                theme="auto"/>
-    {:else}
-        <Alert
-                class=""
-                children="{alertDataValue.err}"
-                color="warning"
-                closeClassName=""
-                closeAriaLabel="Close"
-                dismissible
-                fade
-                heading=""
-                isOpen
-                theme="auto"/>
-    {/if}
-{/if}
+            class=""
+            children="{alertDataValue.err}"
+            color="{alertDataValue.code === 500? 'danger' : 'warning'}"
+            closeClassName=""
+            closeAriaLabel="Close"
+            dismissible={false}
+            fade
+            isOpen
+            theme="auto"/>
+    </ModalBody>
+    <ModalFooter>
+        <Button color="primary" on:click={toggle}>확인</Button>
+    </ModalFooter>
+</Modal>
 
 <slot></slot>

@@ -2,6 +2,7 @@
 	import { onDestroy } from 'svelte';
 	import { userData } from '../stores.js';
 	import { goto } from '$app/navigation';
+	import { base } from '$app/paths';
 	import { Button, Container } from '@sveltestrap/sveltestrap';
 
 	let userDataValue;

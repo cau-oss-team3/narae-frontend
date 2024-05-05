@@ -59,7 +59,7 @@
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',
-					'access-token': userDataValue.token
+					'token': userDataValue.token
 				}
 			});
 

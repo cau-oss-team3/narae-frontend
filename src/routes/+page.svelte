@@ -14,9 +14,9 @@
 
 	const redirect = () => {
 		if (userDataValue != null) {
-			goto('/mentors'); //멘토 리스트 페이지로 넘겨줌
+			goto('{base}/mentors'); //멘토 리스트 페이지로 넘겨줌
 		} else {
-			goto('/auth'); //로그인 페이지로 넘겨줌
+			goto('{base}/auth'); //로그인 페이지로 넘겨줌
 		}
 	};
 </script>

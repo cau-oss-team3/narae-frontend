@@ -14,7 +14,7 @@
 		ModalFooter,
 		ModalHeader
 	} from '@sveltestrap/sveltestrap';
-
+	import { base } from '$app/paths';
 	import { goto } from '$app/navigation';
 	import { userData, alertData } from '../../stores.js';
 	import { PUBLIC_API_SERVER } from '$env/static/public';
@@ -78,19 +78,19 @@
 	// chat 페이지로 보내기
 	const goToChat = (id) => {
 		if (id != null) {
-			goto('/chat?id=' + id); //chat 페이지로 넘겨줌
+			goto({ base } + '/chat?id=' + id); //chat 페이지로 넘겨줌
 		}
 	};
 
 	// mentors - manager 페이지 생성모드로 보내기
 	const goToCreateMentor = () => {
-		goto('/mentors/manager'); //멘토 매니저 페이지 생성모드로 넘겨줌
+		goto({ base } + '/mentors/manager'); //멘토 매니저 페이지 생성모드로 넘겨줌
 	};
 
 	// mentors - manager 페이지 수정모드로 보내기
 	const goToEditMentor = (id) => {
 		if (id != null) {
-			goto('/mentors/manager?id=' + id); //멘토 매니저 페이지 수정모드로 넘겨줌
+			goto({ base } + '/mentors/manager?id=' + id); //멘토 매니저 페이지 수정모드로 넘겨줌
 		}
 	};
 

@@ -37,7 +37,7 @@
 
 		if (json.isSuccess) {
 			userData.set({ email: values.email, token: json.token });
-			goto('/mentors'); //멘토 리스트 페이지로 넘겨줌
+			goto({ base } + '/mentors'); //멘토 리스트 페이지로 넘겨줌
 		} else {
 			alertData.set({ code: res.status, err: json.err });
 		}

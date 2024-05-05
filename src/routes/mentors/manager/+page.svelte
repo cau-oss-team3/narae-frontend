@@ -87,7 +87,7 @@
 				calibrate: json.mentor_detail.mentor_sticc.calibrate
 			};
 		} else {
-			goto('/mentors'); // 멘토 정보가 없는경우 멘토 리스트 페이지로 넘겨줌
+			goto({ base } + '/mentors'); // 멘토 정보가 없는경우 멘토 리스트 페이지로 넘겨줌
 			alert('멘토 정보를 불러오는데 문제가 생겼습니다.');
 			//alertData.set({code:res.status, err:json.err});
 		}
@@ -146,7 +146,7 @@
 		const json = await res.json();
 
 		if (json.isSuccess) {
-			goto('/mentors'); //멘토 리스트 페이지로 넘겨줌
+			goto({ base } + '/mentors'); //멘토 리스트 페이지로 넘겨줌
 			alert('멘토 생성 성공!');
 		} else {
 			alertData.set({ code: res.status, err: json.err });
@@ -184,7 +184,7 @@
 		const json = await res.json();
 
 		if (json.isSuccess) {
-			goto('/mentors'); //멘토 리스트 페이지로 넘겨줌
+			goto({ base } + '/mentors'); //멘토 리스트 페이지로 넘겨줌
 			alert('멘토 수정 성공!');
 		} else {
 			if (res.status === 404) {

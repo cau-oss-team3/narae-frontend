@@ -21,6 +21,7 @@
 	import { onDestroy } from 'svelte';
 	import { userData, alertData } from '../stores.js';
 	import { afterNavigate, goto } from '$app/navigation';
+	import { base } from '$app/paths';
 	import { PUBLIC_API_SERVER } from '$env/static/public';
 
 	let userDataValue;
@@ -66,7 +67,7 @@
 
 			if (json.isSuccess) {
 				userData.set(null);
-				goto('/'); //메인 페이지로 넘겨줌
+				goto({ base } + '/'); //메인 페이지로 넘겨줌
 			} else {
 				alertData.set({ code: res.status, err: json.err });
 			}
@@ -85,12 +86,12 @@
 	sticky=""
 	theme="auto"
 >
-	<NavbarBrand href="/">나의 과외 선생님 "나래"</NavbarBrand>
+	<NavbarBrand href="{base}/">나의 과외 선생님 "나래"</NavbarBrand>
 	<NavbarToggler on:click={() => (isOpen = !isOpen)} />
 	<Collapse {isOpen} navbar expand="md" on:update={handleUpdate}>
 		<Nav class="ms-auto" navbar>
 			<NavItem>
-				<NavLink href="/test">테스트</NavLink>
+				<NavLink href="{base}/test">테스트</NavLink>
 				<!-- TODO 배포전 삭제 -->
 			</NavItem>
 			<NavItem>
@@ -104,7 +105,7 @@
 						<DropdownItem divider />
 						<DropdownItem on:click={() => doLogout()}>Logout</DropdownItem>
 					{:else}
-						<DropdownItem href="auth/">Login</DropdownItem>
+						<DropdownItem href="{base}/auth/">Login</DropdownItem>
 					{/if}
 				</DropdownMenu>
 			</Dropdown>

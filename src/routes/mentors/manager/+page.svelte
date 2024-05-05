@@ -15,7 +15,11 @@
 		Row
 	} from '@sveltestrap/sveltestrap';
 
-	const id = $page.url.searchParams.get('id');
+	let id = '';
+
+	onMount(() => {
+		id = $page.url.searchParams.get('id');
+	});
 
 	let validated = false;
 	let values = {};

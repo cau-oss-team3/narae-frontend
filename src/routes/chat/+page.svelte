@@ -1,7 +1,7 @@
 <!-- TODO 개발 -->
 <script>
-	import { page } from '$app/stores';
 	import { onMount } from 'svelte';
+	import { page } from '$app/stores';
 	import { PUBLIC_API_SERVER } from '$env/static/public';
 	import { alertData, userData } from '../../stores.js';
 	import { goto } from '$app/navigation';
@@ -22,7 +22,11 @@
 		Row
 	} from '@sveltestrap/sveltestrap';
 
-	const id = $page.url.searchParams.get('id'); // 다른 페이지에서 파라미터로 넘어오는 멘토 ID임
+	let id = '';
+
+	onMount(() => {
+		id = $page.url.searchParams.get('id'); // 다른 페이지에서 파라미터로 넘어오는 멘토 ID임
+	});
 
 	let validated = false;
 	let element;

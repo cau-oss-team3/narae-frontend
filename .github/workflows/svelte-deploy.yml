@@ -17,6 +17,10 @@ jobs:
           node-version: 20
           cache: npm
 
+      - name: create .env
+        run: |
+          echo PUBLIC_API_SERVER=${{ secrets.PUBLIC_API_SERVER }} >> .env
+
       - name: Install dependencies
         run: npm install
 

@@ -18,7 +18,15 @@
 	import { goto } from '$app/navigation';
 	import { userData, alertData } from '../../stores.js';
 	import { PUBLIC_API_SERVER } from '$env/static/public';
-	import { onMount } from 'svelte';
+	import {onDestroy, onMount} from 'svelte';
+
+	let userDataValue;
+	const unsubscribeUserData = userData.subscribe((value) => {
+		userDataValue = value;
+	});
+	onDestroy(() => {
+		unsubscribeUserData
+	});
 
 	let open = [];
 
@@ -52,11 +60,12 @@
 
 	// 맨토 리스트 불러오기
 	async function getMentorList() {
+		console.log(userData);
 		const res = await fetch(PUBLIC_API_SERVER + '/mentors', {
 			method: 'GET',
 			headers: {
 				'Content-Type': 'application/json',
-				Authorization: userData.token
+				'token': userDataValue.token
 			}
 		});
 
@@ -100,7 +109,7 @@
 			method: 'DELETE',
 			headers: {
 				'Content-Type': 'application/json',
-				Authorization: userData.token
+				'token': userDataValue.token
 			}
 		});
 

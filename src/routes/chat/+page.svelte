@@ -1,6 +1,6 @@
 <!-- TODO 개발 -->
 <script>
-	import { onMount } from 'svelte';
+	import {onDestroy, onMount} from 'svelte';
 	import { page } from '$app/stores';
 	import { PUBLIC_API_SERVER } from '$env/static/public';
 	import { alertData, userData } from '../../stores.js';
@@ -22,6 +22,14 @@
 		Input,
 		Row
 	} from '@sveltestrap/sveltestrap';
+
+	let userDataValue;
+	const unsubscribeUserData = userData.subscribe((value) => {
+		userDataValue = value;
+	});
+	onDestroy(() => {
+		unsubscribeUserData
+	});
 
 	let id = '';
 
@@ -170,7 +178,7 @@
 			method: 'GET',
 			headers: {
 				'Content-Type': 'application/json',
-				Authorization: userData.token
+				'token': userDataValue.token
 			}
 		});
 
@@ -196,7 +204,7 @@
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
-				Authorization: userData.token
+				'token': userDataValue.token
 			},
 			body: JSON.stringify(data)
 		});
@@ -226,7 +234,7 @@
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
-				Authorization: userData.token
+				'token': userDataValue.token
 			},
 			body: JSON.stringify(data)
 		});

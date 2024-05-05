@@ -182,7 +182,7 @@
         <br>
     {/each}
 
-    <Container fluid class="d-flex justify-content-end" style="margin-top: 30px; margin-bottom: 30px;">
+    <Container fluid class="d-flex justify-content-end" style="margin-top: 30px; padding-bottom: 30px;">
         <Button
                 class=""
                 active={false}

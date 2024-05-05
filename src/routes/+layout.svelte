@@ -67,7 +67,7 @@
 
 			if (json.isSuccess) {
 				userData.set(null);
-				goto({ base } + '/'); //메인 페이지로 넘겨줌
+				goto(base + '/'); //메인 페이지로 넘겨줌
 			} else {
 				alertData.set({ code: res.status, err: json.err });
 			}

@@ -5,6 +5,7 @@
 	import { PUBLIC_API_SERVER } from '$env/static/public';
 	import { alertData, userData } from '../../stores.js';
 	import { goto } from '$app/navigation';
+	import { base } from '$app/paths';
 	import {
 		Button,
 		Card,
@@ -143,7 +144,7 @@
 
 	onMount(() => {
 		if (id == null) {
-			goto('/mentors'); // 멘토 id가 없는 경우 멘토 리스트 페이지로 넘겨줌
+			goto(base + '/mentors'); // 멘토 id가 없는 경우 멘토 리스트 페이지로 넘겨줌
 			alert('멘토 ID가 없습니다!');
 			return;
 		}

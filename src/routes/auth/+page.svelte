@@ -12,6 +12,7 @@
 	} from '@sveltestrap/sveltestrap';
 
 	import { goto } from '$app/navigation';
+	import { base } from '$app/paths';
 	import { userData, alertData } from '../../stores.js';
 	import { PUBLIC_API_SERVER } from '$env/static/public';
 
@@ -37,7 +38,7 @@
 
 		if (json.isSuccess) {
 			userData.set({ email: values.email, token: json.token });
-			goto({ base } + '/mentors'); //멘토 리스트 페이지로 넘겨줌
+			goto(base + '/mentors'); //멘토 리스트 페이지로 넘겨줌
 		} else {
 			alertData.set({ code: res.status, err: json.err });
 		}

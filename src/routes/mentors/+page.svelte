@@ -78,19 +78,19 @@
 	// chat 페이지로 보내기
 	const goToChat = (id) => {
 		if (id != null) {
-			goto({ base } + '/chat?id=' + id); //chat 페이지로 넘겨줌
+			goto(base + '/chat?id=' + id); //chat 페이지로 넘겨줌
 		}
 	};
 
 	// mentors - manager 페이지 생성모드로 보내기
 	const goToCreateMentor = () => {
-		goto({ base } + '/mentors/manager'); //멘토 매니저 페이지 생성모드로 넘겨줌
+		goto(base + '/mentors/manager'); //멘토 매니저 페이지 생성모드로 넘겨줌
 	};
 
 	// mentors - manager 페이지 수정모드로 보내기
 	const goToEditMentor = (id) => {
 		if (id != null) {
-			goto({ base } + '/mentors/manager?id=' + id); //멘토 매니저 페이지 수정모드로 넘겨줌
+			goto(base + '/mentors/manager?id=' + id); //멘토 매니저 페이지 수정모드로 넘겨줌
 		}
 	};
 

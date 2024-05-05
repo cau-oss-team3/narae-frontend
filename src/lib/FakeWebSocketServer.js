@@ -3,7 +3,7 @@ export class FakeWebSocketServer {
       this.clients = new Set();
       this.messageInterval = undefined;
     }
-  
+
     start() {
       // Simulate incoming messages from clients
       this.messageInterval = setInterval(() => {
@@ -15,11 +15,11 @@ export class FakeWebSocketServer {
       console.log(`Start fake server`);
 
     }
-  
+
     stop() {
       clearInterval(/** @type {{ id: number | undefined; }} */ this.messageInterval);
     }
-  
+
     /**
      * @param {{ onmessage: ((event: any) => void) | ((event: any) => void); }} client
      */
@@ -27,7 +27,7 @@ export class FakeWebSocketServer {
       this.clients.add(client);
       console.log(`Client connected. Total clients: ${this.clients.size}`);
     }
-  
+
     /**
      * @param {{ onmessage: (event: any) => void; }} client
      */
@@ -35,7 +35,7 @@ export class FakeWebSocketServer {
       this.clients.delete(client);
       console.log(`Client disconnected. Total clients: ${this.clients.size}`);
     }
-  
+
     /**
      * @param {{ onmessage: (arg0: { data: any; }) => void; }} client
      * @param {string} message
@@ -45,7 +45,7 @@ export class FakeWebSocketServer {
         client.onmessage({ data: message });
       }
     }
-  
+
     generateRandomMessage() {
       const messages = [
         "안녕하세요! 오늘은 어떻게 지내셨나요?",

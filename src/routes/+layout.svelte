@@ -91,10 +91,6 @@
 	<Collapse {isOpen} navbar expand="md" on:update={handleUpdate}>
 		<Nav class="ms-auto" navbar>
 			<NavItem>
-				<NavLink href="{base}/test">테스트</NavLink>
-				<!-- TODO 배포전 삭제 -->
-			</NavItem>
-			<NavItem>
 				<NavLink href="https://github.com/cau-oss-team3">GitHub</NavLink>
 			</NavItem>
 			<Dropdown nav inNavbar>

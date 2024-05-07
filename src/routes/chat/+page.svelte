@@ -22,6 +22,7 @@
         Input,
         Row
     } from '@sveltestrap/sveltestrap';
+    import {writable} from "svelte/store";
 
     let id = '';
     let ws = null;
@@ -79,13 +80,16 @@
         ws.onmessage = function (event) {
             const data = JSON.parse(event.data);
             addMessage(data);
+            messagePending.set(false);
         };
 
         ws.onerror = function (error) {
+            messagePending.set(false);
             console.error("WebSocket error:", error);
         };
 
         ws.onclose = () => {
+            messagePending.set(false);
             console.log("WebSocket is closed now.");
             if (reconnectAttempts < maxReconnectAttempts) {
                 let timeout = Math.pow(2, reconnectAttempts) * 1000;  // Exponential backoff
@@ -121,6 +125,7 @@
 
     let input_chat_data = '';
     let input_temp_data = '';
+    let messagePending = writable(false);
 
     // Function to add a new message to the chat
     /**
@@ -246,27 +251,15 @@
     }
 
 
-    // 메시지 전송 TODO 구현
+
     async function sendMessage() {
         const messageData = {
-            // 채팅창에 입력한 데이터임 이거 사용하면됨
             chat_type: 0,
             chat_data: input_chat_data
         };
 
-        //TODO Websocket 구현
-		if (ws.readyState === WebSocket.OPEN) {
-			ws.send(JSON.stringify(messageData));
-			input_chat_data = ''; // Clear input after sending
-		} else {
-			console.error('WebSocket is not open.');
-		}
-
-        // 웹소켓 전송했을때 에러가 없는경우
-        let isErr = false;
-
-        if (!isErr) {
-            //에러가 없는 경우
+        if (ws.readyState === WebSocket.OPEN) {
+            ws.send(JSON.stringify(messageData));
             addMessage({
                 seq: -1,
                 chat_type: 0,
@@ -275,8 +268,10 @@
                 timestamp: new Date().getTime(),
                 visibility: true
             });
+            messagePending.set(true);  // Set pending message to true when sending
+            input_chat_data = ''; // Clear input after sending
         } else {
-            //TODO 에러 처리 alertData.set({code:res.status, err:json.err});
+            console.error('WebSocket is not open.');
         }
     }
 </script>
@@ -330,35 +325,49 @@
                         }).format(message.timestamp)}</CardFooter
                         >
                     </Card>
-                {:else if message.chat_type == 2} <!--멘토 정보 출력-->
-                    <Card style="margin-bottom: 20px; margin-left: 10%; margin-right: 10%;">
-                        <CardHeader>
-                            <CardTitle style="text-align: center;">멘토 정보</CardTitle>
+                {:else if message.chat_type == 2} <!-- 멘토 정보 출력 -->
+                    <Card style="margin-bottom: 20px; margin-left: 10%; margin-right: 10%; border: 1px solid #ccc; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                        <CardHeader style="background-color: #f7f7f7; border-bottom: 1px solid #eee; padding: 16px;">
+                            <CardTitle style="text-align: center; font-size: 24px; color: #333; font-weight: bold;">멘토
+                                정보
+                            </CardTitle>
                         </CardHeader>
-                        <CardBody style="text-align: center;">
-                            <CardSubtitle>멘토 이름: {mentor_detail.mentor_name}</CardSubtitle>
-                            <br/>
-                            <CardText>
-                                멘토의 분야: {fieldCodeToString(mentor_detail.mentor_field)}
-                                <br/>
-                                <br/>
-                                <h5>현재 멘토링 중인 정보</h5>
-                                상황:<br/>
-                                {mentor_detail.mentor_sticc.situation}
-                                <br/><br/>
-                                작업: <br/>
-                                {mentor_detail.mentor_sticc.task}
-                                <br/><br/>
-                                의도: <br/>
-                                {mentor_detail.mentor_sticc.intent}
-                                <br/><br/>
-                                고민: <br/>
-                                {mentor_detail.mentor_sticc.concern}
-                                <br/><br/>
-                                추가 정보: <br/>
-                                {mentor_detail.mentor_sticc.calibrate}
-                                <br/>
+                        <CardBody style="text-align: center; padding: 20px;">
+                            <CardText
+                                    style="text-align: center; font-size: 18px; font-weight: bold; color: #555; margin-bottom: 20px;">
+                                개발에서 어려움이 있다면 말해주세요. <br/>
+                                답변 생성이 20초 정도 걸릴 수 있으니 기다려주세요!
                             </CardText>
+
+                            <div style="text-align: left; margin-top: 20px;">
+                                <CardSubtitle style="font-size: 20px; font-weight: bold; color: #444;">멘토
+                                    이름: {mentor_detail.mentor_name}</CardSubtitle>
+                                <br/>
+                                <CardText style="font-size: 16px; color: #666;">
+                                    멘토의 분야: {fieldCodeToString(mentor_detail.mentor_field)}
+                                    <br/>
+                                    <br/>
+                                    <div style="font-size: 18px; font-weight: bold; margin-bottom: 10px;">현재 멘토링 중인 정보
+                                    </div>
+                                    <div style="font-size: 16px;">
+                                        상황:<br/>
+                                        {mentor_detail.mentor_sticc.situation}
+                                        <br/><br/>
+                                        작업: <br/>
+                                        {mentor_detail.mentor_sticc.task}
+                                        <br/><br/>
+                                        의도: <br/>
+                                        {mentor_detail.mentor_sticc.intent}
+                                        <br/><br/>
+                                        고민: <br/>
+                                        {mentor_detail.mentor_sticc.concern}
+                                        <br/><br/>
+                                        추가 정보: <br/>
+                                        {mentor_detail.mentor_sticc.calibrate}
+                                        <br/>
+                                    </div>
+                                </CardText>
+                            </div>
                         </CardBody>
                     </Card>
                 {:else if message.chat_type == 3}
@@ -564,7 +573,7 @@
         <Container fluid style="display: {inputChatDisplayValue};">
             <Row>
                 <Col>
-                    <FormGroup floating label="여기에 내용을 입력하세요." class="form-outline mb-4">
+                    <FormGroup floating label="여기에 어려움을 겪고 있는 내용을 입력하세요." class="form-outline mb-4">
                         <Input
                                 type="text"
                                 name="input_chat"
@@ -577,20 +586,17 @@
                 <Col xxs="2" sm="2">
                     <Button
                             class=""
-                            active={false}
                             block={true}
-                            children="Button"
-                            close={false}
                             color="primary"
-                            disabled={false}
-                            href=""
-                            outline={false}
                             size="lg"
-                            value="">전송
-                    </Button
-                    >
+                    >전송</Button>
                 </Col>
             </Row>
+            {#if $messagePending}
+                <div style="text-align: center; color: red;">
+                    응답 생성 중입니다. 잠시만 기다려 주세요!
+                </div>
+            {/if}
         </Container>
     </Form>
 </div>

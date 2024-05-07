@@ -30,12 +30,13 @@
     let reconnectAttempts = 0;
     const maxReconnectAttempts = 5;
 
-    const unsubscribeUserData = userData.subscribe((value) => {
+    const unsubscribeUserData = userData.subscribe(async (value) => {
         userDataValue = value;
         if (userDataValue && userDataValue.token) {
             tokenReady = true;
-            if (id) {  // Ensure id is also ready
-                connectWebSocket();  // Connect when both id and token are ready
+            if (id) {
+                await getMentor();
+                connectWebSocket();
             }
         }
     });
@@ -54,10 +55,10 @@
             return;
         }
         if (tokenReady) {  // Check if token is ready before connecting
+            await getMentor();
             connectWebSocket();
         }
     });
-
 
     // Connect to WebSocket
     function connectWebSocket() {
@@ -115,80 +116,6 @@
         scrollToBottom(element);
     }
 
-    /* 더미 데이터 TODO 삭제
-
-    let mentor_detail = {
-        mentor_name: "테스트 멘토 이름",
-        mentor_field: 2,
-        mentor_sticc: {
-            situation: "situation",
-            task: "task",
-            intent: "intent",
-            concern: "concern",
-            calibrate: "calibrate"
-        }
-    };
-    let chat_history = [
-        {
-            seq: 0,
-            type: 2,
-            chat_data: "멘토 정보 출력",
-            candidates: [],
-            timestamp: new Date().getTime(),
-            visibility: true,
-        },
-        {
-            seq: 1,
-            type: 3,
-            chat_data: "이전 대화 요약",
-            candidates: [],
-            timestamp: new Date().getTime(),
-            visibility: true,
-        },
-        {
-            seq: 2,
-            type: 1,
-            chat_data: "멘토 발화 테스트 1",
-            candidates: [],
-            timestamp: new Date().getTime(),
-            visibility: true,
-        },
-        {
-            seq: 3,
-            type: 0,
-            chat_data: "유저 발화 테스트 1",
-            candidates: [],
-            timestamp: new Date().getTime(),
-            visibility: true,
-        },
-        {
-            seq: 4,
-            type: 4,
-            chat_data: "Action 수락 요청",
-            candidates: ["Action 1", "Action 2", "Action 3"],
-            timestamp: new Date().getTime(),
-            visibility: true,
-        },
-        {
-            seq: 5,
-            type: 5,
-            chat_data: "Action 결과 제출 요청",
-            candidates: ["Action 1"], // 무조건 0번 index 사용
-            timestamp: new Date().getTime(),
-            visibility: true,
-        },
-        {
-            seq: 6,
-            type: 1,
-            chat_data: "멘토 발화 테스트 2",
-            candidates: [],
-            timestamp: new Date().getTime(),
-            visibility: true,
-        },
-    ];
-
-     */
-
     let mentor_detail = null;
     let chat_history = [];
 
@@ -235,7 +162,6 @@
     // 맨토 정보 불러오기
     async function getMentor() {
         if (!userDataValue?.token) {
-            console.log('Token is not available.')
             alert('불편을 드려 죄송합니다.\n현재 베타버전에서는 새로고침은 지원되지 않습니다.\n다시 로그인 부탁드립니다.');
             await goto(base + '/auth');
             return;
@@ -250,6 +176,7 @@
         });
 
         const json = await res.json();
+        console.log("Mentor Detail:", json);
 
         if (json.isSuccess) {
             mentor_detail = json.mentor_detail;
@@ -403,7 +330,7 @@
                         }).format(message.timestamp)}</CardFooter
                         >
                     </Card>
-                {:else if message.chat_type == 2}
+                {:else if message.chat_type == 2} <!--멘토 정보 출력-->
                     <Card style="margin-bottom: 20px; margin-left: 10%; margin-right: 10%;">
                         <CardHeader>
                             <CardTitle style="text-align: center;">멘토 정보</CardTitle>
@@ -412,23 +339,23 @@
                             <CardSubtitle>멘토 이름: {mentor_detail.mentor_name}</CardSubtitle>
                             <br/>
                             <CardText>
-                                분야: {fieldCodeToString(mentor_detail.mentor_field)}
+                                멘토의 분야: {fieldCodeToString(mentor_detail.mentor_field)}
                                 <br/>
                                 <br/>
-                                <h5>STICC</h5>
-                                Situation:<br/>
+                                <h5>현재 멘토링 중인 정보</h5>
+                                상황:<br/>
                                 {mentor_detail.mentor_sticc.situation}
                                 <br/><br/>
-                                Task: <br/>
+                                작업: <br/>
                                 {mentor_detail.mentor_sticc.task}
                                 <br/><br/>
-                                Intent: <br/>
+                                의도: <br/>
                                 {mentor_detail.mentor_sticc.intent}
                                 <br/><br/>
-                                Concern: <br/>
+                                고민: <br/>
                                 {mentor_detail.mentor_sticc.concern}
                                 <br/><br/>
-                                Calibrate: <br/>
+                                추가 정보: <br/>
                                 {mentor_detail.mentor_sticc.calibrate}
                                 <br/>
                             </CardText>
@@ -667,3 +594,75 @@
         </Container>
     </Form>
 </div>
+
+<!-- TODO 테스트 데이터
+let mentor_detail = {
+    mentor_name: "테스트 멘토 이름",
+    mentor_field: 2,
+    mentor_sticc: {
+        situation: "situation",
+        task: "task",
+        intent: "intent",
+        concern: "concern",
+        calibrate: "calibrate"
+    }
+};
+let chat_history = [
+    {
+        seq: 0,
+        type: 2,
+        chat_data: "멘토 정보 출력",
+        candidates: [],
+        timestamp: new Date().getTime(),
+        visibility: true,
+    },
+    {
+        seq: 1,
+        type: 3,
+        chat_data: "이전 대화 요약",
+        candidates: [],
+        timestamp: new Date().getTime(),
+        visibility: true,
+    },
+    {
+        seq: 2,
+        type: 1,
+        chat_data: "멘토 발화 테스트 1",
+        candidates: [],
+        timestamp: new Date().getTime(),
+        visibility: true,
+    },
+    {
+        seq: 3,
+        type: 0,
+        chat_data: "유저 발화 테스트 1",
+        candidates: [],
+        timestamp: new Date().getTime(),
+        visibility: true,
+    },
+    {
+        seq: 4,
+        type: 4,
+        chat_data: "Action 수락 요청",
+        candidates: ["Action 1", "Action 2", "Action 3"],
+        timestamp: new Date().getTime(),
+        visibility: true,
+    },
+    {
+        seq: 5,
+        type: 5,
+        chat_data: "Action 결과 제출 요청",
+        candidates: ["Action 1"], // 무조건 0번 index 사용
+        timestamp: new Date().getTime(),
+        visibility: true,
+    },
+    {
+        seq: 6,
+        type: 1,
+        chat_data: "멘토 발화 테스트 2",
+        candidates: [],
+        timestamp: new Date().getTime(),
+        visibility: true,
+    },
+];
+!-->

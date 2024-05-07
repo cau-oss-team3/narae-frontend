@@ -21,6 +21,7 @@ jobs:
       - name: create .env
         run: |
           echo PUBLIC_API_SERVER=${{ secrets.PUBLIC_API_SERVER }} >> .env
+          echo PUBLIC_WS_SERVER=${{ secrets.PUBLIC_WS_SERVER }} >> .env
 
       - name: Install dependencies
         run: npm install

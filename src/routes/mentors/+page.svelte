@@ -61,11 +61,11 @@
 	// 맨토 리스트 불러오기
 	async function getMentorList() {
 		console.log(userData);
-		const res = await fetch(PUBLIC_API_SERVER + '/mentors', {
+		const res = await fetch(PUBLIC_API_SERVER + '/mentors2', {
 			method: 'GET',
 			headers: {
 				'Content-Type': 'application/json',
-				'token': userDataValue.token
+				'Authorization': userDataValue.token
 			}
 		});
 
@@ -105,11 +105,11 @@
 
 	// mentor 삭제
 	async function removeMentor(id) {
-		const res = await fetch(PUBLIC_API_SERVER + '/mentors/' + id, {
+		const res = await fetch(PUBLIC_API_SERVER + '/mentors2/' + id, {
 			method: 'DELETE',
 			headers: {
 				'Content-Type': 'application/json',
-				'token': userDataValue.token
+				'Authorization': userDataValue.token
 			}
 		});
 

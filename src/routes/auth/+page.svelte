@@ -26,7 +26,7 @@
 			password: values.password
 		};
 
-		const res = await fetch(PUBLIC_API_SERVER + '/auth/login', {
+		const res = await fetch(PUBLIC_API_SERVER + '/auth/token_json', {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json'
@@ -37,7 +37,7 @@
 		const json = await res.json();
 
 		if (json.isSuccess) {
-			userData.set({ email: values.email, token: json.token });
+			userData.set({ email: values.email, token: json.token_type + ' ' + json.access_token });
 			goto(base + '/mentors'); //멘토 리스트 페이지로 넘겨줌
 		} else {
 			alertData.set({ code: res.status, err: json.err });

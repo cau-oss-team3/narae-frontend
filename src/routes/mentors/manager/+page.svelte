@@ -74,11 +74,11 @@
 
          */
 
-		const res = await fetch(PUBLIC_API_SERVER + '/mentors/' + id, {
+		const res = await fetch(PUBLIC_API_SERVER + '/mentors2/' + id, {
 			method: 'GET',
 			headers: {
 				'Content-Type': 'application/json',
-				'token': userDataValue.token
+				'Authorization': userDataValue.token
 			}
 		});
 
@@ -143,11 +143,11 @@
 			}
 		};
 
-		const res = await fetch(PUBLIC_API_SERVER + '/mentors', {
+		const res = await fetch(PUBLIC_API_SERVER + '/mentors2', {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
-				'token': userDataValue.token
+				'Authorization': userDataValue.token
 			},
 			body: JSON.stringify(data)
 		});
@@ -181,11 +181,11 @@
 			}
 		};
 
-		const res = await fetch(PUBLIC_API_SERVER + '/mentors/' + id, {
+		const res = await fetch(PUBLIC_API_SERVER + '/mentors2/' + id, {
 			method: 'PUT',
 			headers: {
 				'Content-Type': 'application/json',
-				'token': userDataValue.token
+				'Authorization': userDataValue.token
 			},
 			body: JSON.stringify(data)
 		});

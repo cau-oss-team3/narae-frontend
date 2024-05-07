@@ -174,11 +174,11 @@
 
 	// 맨토 정보 불러오기
 	async function getMentor() {
-		const res = await fetch(PUBLIC_API_SERVER + '/mentors/' + id, {
+		const res = await fetch(PUBLIC_API_SERVER + '/mentors2/' + id, {
 			method: 'GET',
 			headers: {
 				'Content-Type': 'application/json',
-				'token': userDataValue.token
+				'Authorization': userDataValue.token
 			}
 		});
 
@@ -204,7 +204,7 @@
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
-				'token': userDataValue.token
+				'Authorization': userDataValue.token
 			},
 			body: JSON.stringify(data)
 		});
@@ -234,7 +234,7 @@
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
-				'token': userDataValue.token
+				'Authorization': userDataValue.token
 			},
 			body: JSON.stringify(data)
 		});

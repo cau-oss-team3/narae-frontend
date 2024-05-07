@@ -55,6 +55,10 @@
 	// 로그아웃
 	async function doLogout() {
 		if (userDataValue != null) {
+			userData.set(null);
+			goto(base + '/'); //메인 페이지로 넘겨줌
+
+			/*
 			const res = await fetch(PUBLIC_API_SERVER + '/auth/logout', {
 				method: 'POST',
 				headers: {
@@ -71,6 +75,8 @@
 			} else {
 				alertData.set({ code: res.status, err: json.err });
 			}
+
+			 */
 		}
 	}
 </script>

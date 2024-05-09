@@ -4,7 +4,7 @@
 	import { goto } from '$app/navigation';
 	import { base } from '$app/paths';
 	import { PUBLIC_API_SERVER } from '$env/static/public';
-	import { alertData, userData } from '../../../stores.js';
+	import { alertData } from '../../../stores.js';
 	import {
 		Button,
 		Card,
@@ -15,6 +15,7 @@
 		Input,
 		Row
 	} from '@sveltestrap/sveltestrap';
+	import {userData} from "$lib/auth.js";
 
 	let userDataValue;
 	const unsubscribeUserData = userData.subscribe((value) => {

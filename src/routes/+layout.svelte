@@ -19,10 +19,11 @@
 		NavLink
 	} from '@sveltestrap/sveltestrap';
 	import { onDestroy } from 'svelte';
-	import { userData, alertData } from '../stores.js';
+	import { alertData } from '../stores.js';
 	import { afterNavigate, goto } from '$app/navigation';
 	import { base } from '$app/paths';
 	import { PUBLIC_API_SERVER } from '$env/static/public';
+	import {userData} from "$lib/auth.js";
 
 	let userDataValue;
 	let alertDataValue;

@@ -13,8 +13,9 @@
 
 	import { goto } from '$app/navigation';
 	import { base } from '$app/paths';
-	import { userData, alertData } from '../../stores.js';
+	import { alertData } from '../../stores.js';
 	import { PUBLIC_API_SERVER } from '$env/static/public';
+	import {userData} from "$lib/auth.js";
 
 	let validated = false;
 	let values = {};

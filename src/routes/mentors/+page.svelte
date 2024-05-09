@@ -16,9 +16,10 @@
 	} from '@sveltestrap/sveltestrap';
 	import { base } from '$app/paths';
 	import { goto } from '$app/navigation';
-	import { userData, alertData } from '../../stores.js';
+	import { alertData } from '../../stores.js';
 	import { PUBLIC_API_SERVER } from '$env/static/public';
 	import {onDestroy, onMount} from 'svelte';
+	import {userData} from "$lib/auth.js";
 
 	let userDataValue;
 	const unsubscribeUserData = userData.subscribe((value) => {

@@ -126,13 +126,14 @@
 
     let input_chat_data = '';
     let input_temp_data = '';
+    let input_feedback_data = '';
     let messagePending = writable(false);
 
     // Function to add a new message to the chat
     /**
      * @param {{
      *    "seq": "int",
-     *    "type": "Chat Type Code <int>",
+     *    "chat_type": "Chat Type Code <int>",
      *    "chat_data": "string",
      *    "candidates": [ "string" ],
      *    "timestamp": "UnixTime Milliseconds <int>",
@@ -251,6 +252,34 @@
         }
     }
 
+    // Feedback post
+    async function postFeedback(index, type, content) {
+        const data = {
+            type: type,
+            content: content,
+        };
+
+        const res = await fetch(PUBLIC_API_SERVER + '/feedback/' + id, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': userDataValue.token
+            },
+            body: JSON.stringify(data)
+        });
+
+        const json = await res.json();
+
+        if (json.isSuccess) {
+            chat_history[index].visibility = false;
+            inputChatDisplayValue = '';
+
+            addMessage(json.chat_data);
+        } else {
+            alertData.set({code: res.status, err: json.err});
+        }
+    }
+
 
 
     async function sendMessage() {
@@ -280,8 +309,7 @@
 <div id="chat_container" class="container-fluid" style="height: 75vh;">
     <div
             bind:this={element}
-            style="height: 100%; overflow-y: scroll; margin-top: 20px; padding-bottom: 200px; padding-left: 10px; padding-right: 10px;"
-    >
+            style="height: 100%; overflow-y: scroll; margin-top: 20px; padding-bottom: 200px; padding-left: 10px; padding-right: 10px;">
         {#each chat_history as message, index}
             {#if message.visibility}
                 {#if message.chat_type == 0}
@@ -294,16 +322,14 @@
                                 {message.chat_data}
                             </CardText>
                         </CardBody>
-                        <CardFooter
-                        >{new Intl.DateTimeFormat('ko-KR', {
+                        <CardFooter>{new Intl.DateTimeFormat('ko-KR', {
                             year: 'numeric',
                             month: 'numeric',
                             day: 'numeric',
                             hour: 'numeric',
                             minute: 'numeric',
                             second: 'numeric'
-                        }).format(message.timestamp)}</CardFooter
-                        >
+                        }).format(message.timestamp)}</CardFooter>
                     </Card>
                 {:else if message.chat_type == 1}
                     <Card style="margin-right: 20%; margin-bottom: 20px;">
@@ -315,16 +341,14 @@
                                 {message.chat_data}
                             </CardText>
                         </CardBody>
-                        <CardFooter
-                        >{new Intl.DateTimeFormat('ko-KR', {
+                        <CardFooter>{new Intl.DateTimeFormat('ko-KR', {
                             year: 'numeric',
                             month: 'numeric',
                             day: 'numeric',
                             hour: 'numeric',
                             minute: 'numeric',
                             second: 'numeric'
-                        }).format(message.timestamp)}</CardFooter
-                        >
+                        }).format(message.timestamp)}</CardFooter>
                     </Card>
                 {:else if message.chat_type == 2} <!-- 멘토 정보 출력 -->
                     <Card style="margin-bottom: 20px; margin-left: 10%; margin-right: 10%; border: 1px solid #ccc; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
@@ -409,8 +433,7 @@
                                             size="md"
                                             style="margin-right: 10px;"
                                             on:click={() => acceptAction(index, true, candidate)}
-                                            value="">{candidate}</Button
-                                    >
+                                            value="">{candidate}</Button>
                                 {/each}
                                 <Button
                                         class=""
@@ -426,20 +449,17 @@
                                         style=""
                                         on:click={() => acceptAction(index, false, null)}
                                         value="">거절하기
-                                </Button
-                                >
+                                </Button>
                             </Container>
                         </CardBody>
-                        <CardFooter
-                        >{new Intl.DateTimeFormat('ko-KR', {
+                        <CardFooter>{new Intl.DateTimeFormat('ko-KR', {
                             year: 'numeric',
                             month: 'numeric',
                             day: 'numeric',
                             hour: 'numeric',
                             minute: 'numeric',
                             second: 'numeric'
-                        }).format(message.timestamp)}</CardFooter
-                        >
+                        }).format(message.timestamp)}</CardFooter>
                     </Card>
                 {:else if message.chat_type == 5}
                     <Card style="margin-right: 20%; margin-bottom: 20px;">
@@ -460,19 +480,16 @@
 										message.candidates[0],
 										input_temp_data
 									)}
-                                    method="post"
-                            >
+                                    method="post">
                                 <Row>
                                     <Col>
                                         <FormGroup
                                                 floating
                                                 label="왜 성공 / 실패 / 보류 했는지 짧게 작성해주세요."
-                                                class="form-outline mb-4"
-                                        >
+                                                class="form-outline mb-4">
                                             <Input
                                                     type="text"
-                                                    name="input_chat"
-                                                    id="input_chat"
+                                                    name="input_temp"
                                                     required
                                                     bind:value={input_temp_data}
                                             />
@@ -494,8 +511,7 @@
                                                 size="md"
                                                 style="margin-right: 10px;"
                                                 value="2">보류
-                                        </Button
-                                        >
+                                        </Button>
                                         <Button
                                                 class=""
                                                 active={false}
@@ -509,8 +525,7 @@
                                                 size="md"
                                                 style="margin-right: 10px;"
                                                 value="0">실패
-                                        </Button
-                                        >
+                                        </Button>
                                         <Button
                                                 class=""
                                                 active={false}
@@ -524,22 +539,202 @@
                                                 size="md"
                                                 style="margin-right: 10px;"
                                                 value="1">완수
-                                        </Button
-                                        >
+                                        </Button>
                                     </Container>
                                 </Row>
                             </Form>
                         </CardBody>
-                        <CardFooter
-                        >{new Intl.DateTimeFormat('ko-KR', {
+                        <CardFooter>{new Intl.DateTimeFormat('ko-KR', {
                             year: 'numeric',
                             month: 'numeric',
                             day: 'numeric',
                             hour: 'numeric',
                             minute: 'numeric',
                             second: 'numeric'
-                        }).format(message.timestamp)}</CardFooter
-                        >
+                        }).format(message.timestamp)}</CardFooter>
+                    </Card>
+                {:else if message.chat_type == 6}
+                    <Card style="margin-right: 20%; margin-bottom: 20px;">
+                        <CardHeader>
+                            <CardTitle>Action Feedback 요청</CardTitle>
+                        </CardHeader>
+                        <CardBody>
+                            <CardText>
+                                {message.chat_data}
+                            </CardText>
+                            <Form
+                                    {validated}
+                                    action="javascript:void(0);"
+                                    on:submit={(e) =>
+									postFeedback(
+										index,
+										0,
+										input_temp_data
+									)}
+                                    method="post">
+                                <Row>
+                                    <Col>
+                                        <FormGroup
+                                                floating
+                                                label="피드백을 작성해주세요."
+                                                class="form-outline mb-4">
+                                            <Input
+                                                    type="text"
+                                                    name="input_feedback"
+                                                    required
+                                                    bind:value={input_feedback_data}
+                                            />
+                                        </FormGroup>
+                                    </Col>
+                                </Row>
+                                <Row>
+                                    <Container class="d-flex justify-content-end">
+                                        <Button
+                                                class=""
+                                                active={false}
+                                                block={false}
+                                                children=""
+                                                close={false}
+                                                color="primary"
+                                                disabled={false}
+                                                href=""
+                                                outline={false}
+                                                size="md"
+                                                style="margin-right: 10px;">제출</Button>
+                                    </Container>
+                                </Row>
+                            </Form>
+                        </CardBody>
+                        <CardFooter>{new Intl.DateTimeFormat('ko-KR', {
+                            year: 'numeric',
+                            month: 'numeric',
+                            day: 'numeric',
+                            hour: 'numeric',
+                            minute: 'numeric',
+                            second: 'numeric'
+                        }).format(message.timestamp)}</CardFooter>
+                    </Card>
+                {:else if message.chat_type == 7}
+                    <Card style="margin-right: 20%; margin-bottom: 20px;">
+                        <CardHeader>
+                            <CardTitle>QnA Feedback 요청</CardTitle>
+                        </CardHeader>
+                        <CardBody>
+                            <CardText>
+                                {message.chat_data}
+                            </CardText>
+                            <Form
+                                    {validated}
+                                    action="javascript:void(0);"
+                                    on:submit={(e) =>
+									postFeedback(
+										index,
+										1,
+										input_temp_data
+									)}
+                                    method="post">
+                                <Row>
+                                    <Col>
+                                        <FormGroup
+                                                floating
+                                                label="피드백을 작성해주세요."
+                                                class="form-outline mb-4">
+                                            <Input
+                                                    type="text"
+                                                    name="input_feedback"
+                                                    required
+                                                    bind:value={input_feedback_data}
+                                            />
+                                        </FormGroup>
+                                    </Col>
+                                </Row>
+                                <Row>
+                                    <Container class="d-flex justify-content-end">
+                                        <Button
+                                                class=""
+                                                active={false}
+                                                block={false}
+                                                children=""
+                                                close={false}
+                                                color="primary"
+                                                disabled={false}
+                                                href=""
+                                                outline={false}
+                                                size="md"
+                                                style="margin-right: 10px;">제출</Button>
+                                    </Container>
+                                </Row>
+                            </Form>
+                        </CardBody>
+                        <CardFooter>{new Intl.DateTimeFormat('ko-KR', {
+                            year: 'numeric',
+                            month: 'numeric',
+                            day: 'numeric',
+                            hour: 'numeric',
+                            minute: 'numeric',
+                            second: 'numeric'
+                        }).format(message.timestamp)}</CardFooter>
+                    </Card>
+                {:else if message.chat_type == 8}
+                    <Card style="margin-right: 20%; margin-bottom: 20px;">
+                        <CardHeader>
+                            <CardTitle>학습 방향 Feedback 요청</CardTitle>
+                        </CardHeader>
+                        <CardBody>
+                            <CardText>
+                                {message.chat_data}
+                            </CardText>
+                            <Form
+                                    {validated}
+                                    action="javascript:void(0);"
+                                    on:submit={(e) =>
+									postFeedback(
+										index,
+										2,
+										input_temp_data
+									)}
+                                    method="post">
+                                <Row>
+                                    <Col>
+                                        <FormGroup
+                                                floating
+                                                label="피드백을 작성해주세요."
+                                                class="form-outline mb-4">
+                                            <Input
+                                                    type="text"
+                                                    name="input_feedback"
+                                                    required
+                                                    bind:value={input_feedback_data}
+                                            />
+                                        </FormGroup>
+                                    </Col>
+                                </Row>
+                                <Row>
+                                    <Container class="d-flex justify-content-end">
+                                        <Button
+                                                class=""
+                                                active={false}
+                                                block={false}
+                                                children=""
+                                                close={false}
+                                                color="primary"
+                                                disabled={false}
+                                                href=""
+                                                outline={false}
+                                                size="md"
+                                                style="margin-right: 10px;">제출</Button>
+                                    </Container>
+                                </Row>
+                            </Form>
+                        </CardBody>
+                        <CardFooter>{new Intl.DateTimeFormat('ko-KR', {
+                            year: 'numeric',
+                            month: 'numeric',
+                            day: 'numeric',
+                            hour: 'numeric',
+                            minute: 'numeric',
+                            second: 'numeric'
+                        }).format(message.timestamp)}</CardFooter>
                     </Card>
                 {:else}
                     <Card style="margin-right: 20%; margin-bottom: 20px;">
@@ -557,8 +752,7 @@
                             hour: 'numeric',
                             minute: 'numeric',
                             second: 'numeric'
-                        }).format(message.timestamp)}</CardFooter
-                        >
+                        }).format(message.timestamp)}</CardFooter>
                     </Card>
                 {/if}
             {/if}
@@ -617,7 +811,7 @@ let mentor_detail = {
 let chat_history = [
     {
         seq: 0,
-        type: 2,
+        chat_type: 2,
         chat_data: "멘토 정보 출력",
         candidates: [],
         timestamp: new Date().getTime(),
@@ -625,7 +819,7 @@ let chat_history = [
     },
     {
         seq: 1,
-        type: 3,
+        chat_type: 3,
         chat_data: "이전 대화 요약",
         candidates: [],
         timestamp: new Date().getTime(),
@@ -633,7 +827,7 @@ let chat_history = [
     },
     {
         seq: 2,
-        type: 1,
+        chat_type: 1,
         chat_data: "멘토 발화 테스트 1",
         candidates: [],
         timestamp: new Date().getTime(),
@@ -641,7 +835,7 @@ let chat_history = [
     },
     {
         seq: 3,
-        type: 0,
+        chat_type: 0,
         chat_data: "유저 발화 테스트 1",
         candidates: [],
         timestamp: new Date().getTime(),
@@ -649,7 +843,7 @@ let chat_history = [
     },
     {
         seq: 4,
-        type: 4,
+        chat_type: 4,
         chat_data: "Action 수락 요청",
         candidates: ["Action 1", "Action 2", "Action 3"],
         timestamp: new Date().getTime(),
@@ -657,7 +851,7 @@ let chat_history = [
     },
     {
         seq: 5,
-        type: 5,
+        chat_type: 5,
         chat_data: "Action 결과 제출 요청",
         candidates: ["Action 1"], // 무조건 0번 index 사용
         timestamp: new Date().getTime(),
@@ -665,8 +859,32 @@ let chat_history = [
     },
     {
         seq: 6,
-        type: 1,
+        chat_type: 1,
         chat_data: "멘토 발화 테스트 2",
+        candidates: [],
+        timestamp: new Date().getTime(),
+        visibility: true,
+    },
+    {
+        seq: 7,
+        chat_type: 6,
+        chat_data: "Acion 기능에 대해 여러분의 피드백을 요청합니다.",
+        candidates: [],
+        timestamp: new Date().getTime(),
+        visibility: true,
+    },
+    {
+        seq: 8,
+        chat_type: 7,
+        chat_data: "QnA 기능에 대해 여러분의 피드백을 요청합니다.",
+        candidates: [],
+        timestamp: new Date().getTime(),
+        visibility: true,
+    },
+    {
+        seq: 9,
+        chat_type: 8,
+        chat_data: "학습 방향 기능에 대해 여러분의 피드백을 요청합니다.",
         candidates: [],
         timestamp: new Date().getTime(),
         visibility: true,

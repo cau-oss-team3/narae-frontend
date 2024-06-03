@@ -22,6 +22,7 @@
         Input,
         Row
     } from '@sveltestrap/sveltestrap';
+    import SvelteMarkdown from 'svelte-markdown'
     import {writable} from "svelte/store";
     import {userData} from "$lib/auth.js";
 
@@ -319,7 +320,7 @@
                         </CardHeader>
                         <CardBody>
                             <CardText>
-                                {message.chat_data}
+                                <SvelteMarkdown source={message.chat_data} />
                             </CardText>
                         </CardBody>
                         <CardFooter>{new Intl.DateTimeFormat('ko-KR', {
@@ -338,7 +339,7 @@
                         </CardHeader>
                         <CardBody>
                             <CardText>
-                                {message.chat_data}
+                                <SvelteMarkdown source={message.chat_data} />
                             </CardText>
                         </CardBody>
                         <CardFooter>{new Intl.DateTimeFormat('ko-KR', {
@@ -404,7 +405,7 @@
                             <CardSubtitle style="text-align: center;"><b>대화 요약</b></CardSubtitle>
                             <br/>
                             <CardText>
-                                {message.chat_data}
+                                <SvelteMarkdown source={message.chat_data} />
                             </CardText>
                         </CardBody>
                     </Card>
@@ -416,7 +417,7 @@
                         <CardBody>
                             <CardSubtitle>Card subtitle</CardSubtitle>
                             <CardText>
-                                {message.chat_data}
+                                <SvelteMarkdown source={message.chat_data} />
                             </CardText>
                             <Container class="d-flex justify-content-end">
                                 {#each message.candidates as candidate, index}
@@ -468,7 +469,7 @@
                         </CardHeader>
                         <CardBody>
                             <CardText>
-                                {message.chat_data}
+                                <SvelteMarkdown source={message.chat_data} />
                             </CardText>
                             <Form
                                     {validated}
@@ -560,7 +561,7 @@
                         </CardHeader>
                         <CardBody>
                             <CardText>
-                                {message.chat_data}
+                                <SvelteMarkdown source={message.chat_data} />
                             </CardText>
                             <Form
                                     {validated}
@@ -621,7 +622,7 @@
                         </CardHeader>
                         <CardBody>
                             <CardText>
-                                {message.chat_data}
+                                <SvelteMarkdown source={message.chat_data} />
                             </CardText>
                             <Form
                                     {validated}
@@ -682,7 +683,7 @@
                         </CardHeader>
                         <CardBody>
                             <CardText>
-                                {message.chat_data}
+                                <SvelteMarkdown source={message.chat_data} />
                             </CardText>
                             <Form
                                     {validated}

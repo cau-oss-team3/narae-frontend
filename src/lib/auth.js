@@ -3,19 +3,19 @@ import { writable, get } from 'svelte/store';
 const storage = (key, initValue) => {
     const store = writable(initValue);
 
-    const storedValueStr = localStorage.getItem(key);
+    const storedValueStr = sessionStorage.getItem(key);
     if (storedValueStr != null) store.set(JSON.parse(storedValueStr));
 
     store.subscribe((val) => {
         if ([null, undefined].includes(val)) {
-            localStorage.removeItem(key)
+            sessionStorage.removeItem(key)
         } else {
-            localStorage.setItem(key, JSON.stringify(val))
+            sessionStorage.setItem(key, JSON.stringify(val))
         }
     })
 
     window.addEventListener('storage', () => {
-        const storedValueStr = localStorage.getItem(key);
+        const storedValueStr = sessionStorage.getItem(key);
         if (storedValueStr == null) return;
 
         const localValue = JSON.parse(storedValueStr)

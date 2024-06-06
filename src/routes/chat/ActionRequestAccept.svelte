@@ -1,10 +1,10 @@
 <script>
     import {
+        Button,
         Card,
         CardBody,
         CardFooter,
         CardHeader,
-        CardSubtitle,
         CardText,
         CardTitle,
         Container
@@ -12,6 +12,13 @@
     import SvelteMarkdown from "svelte-markdown";
 
     export let message;
+    export let index;
+    export let onSubmit;
+
+    const submit = (isAccept, candidate)  => {
+        onSubmit(index, isAccept, candidate);
+    }
+
 </script>
 
 <div class="card-chat">
@@ -24,7 +31,29 @@
                 <SvelteMarkdown source={message.chat_data} />
             </CardText>
             <Container class="d-flex justify-content-end">
-                <slot></slot>
+                {#each message.candidates as candidate}
+                    <Button
+                            class="action-button"
+                            active={false}
+                            block={false}
+                            close={false}
+                            color="secondary"
+                            disabled={false}
+                            outline={false}
+                            size="md"
+                            on:click={() => submit(true, candidate)}
+                            value="">{candidate}</Button>
+                {/each}
+                <Button
+                        active={false}
+                        block={false}
+                        close={false}
+                        color="danger"
+                        disabled={false}
+                        outline={false}
+                        size="md"
+                        on:click={() => submit(false, null)}
+                        value="">거절하기</Button>
             </Container>
         </CardBody>
         <CardFooter>{new Intl.DateTimeFormat('ko-KR', {

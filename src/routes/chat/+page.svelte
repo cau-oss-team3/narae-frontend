@@ -12,7 +12,6 @@
         CardBody,
         CardFooter,
         CardHeader,
-        CardSubtitle,
         CardText,
         CardTitle,
         Col,
@@ -22,9 +21,15 @@
         Input,
         Row
     } from '@sveltestrap/sveltestrap';
-    import SvelteMarkdown from 'svelte-markdown'
     import {writable} from "svelte/store";
     import {userData} from "$lib/auth.js";
+    import UserChat from "./UserChat.svelte";
+    import MentorChat from "./MentorChat.svelte";
+    import MentorInfo from "./MentorInfo.svelte";
+    import PreviousChat from "./PreviousChat.svelte";
+    import ActionRequestAccept from "./ActionRequestAccept.svelte";
+    import ActionRequestResultReport from "./ActionRequestResultReport.svelte";
+    import RequestFeedback from "./RequestFeedback.svelte";
 
     let id = '';
     let ws = null;
@@ -154,18 +159,6 @@
 
         getMentor();
     });
-
-    const fieldCodeToString = (code) => {
-        if (code == 0) {
-            return '백엔드';
-        } else if (code == 1) {
-            return '프론트';
-        } else if (code == 2) {
-            return '백엔드, 프론트';
-        } else {
-            return '알수없음';
-        }
-    };
 
     // 맨토 정보 불러오기
     async function getMentor() {
@@ -308,435 +301,212 @@
 </script>
 
 <div id="chat_container" class="container-fluid" style="height: 75vh;">
-    <div
-            bind:this={element}
-            style="height: 100%; overflow-y: scroll; margin-top: 20px; padding-bottom: 200px; padding-left: 10px; padding-right: 10px;">
+    <div class="chat-list" bind:this={element} >
         {#each chat_history as message, index}
             {#if message.visibility}
                 {#if message.chat_type == 0}
-                    <Card style="margin-left: 20%; margin-bottom: 20px; text-align: end;">
-                        <CardHeader>나
-                            <CardTitle>나</CardTitle>
-                        </CardHeader>
-                        <CardBody>
-                            <CardText>
-                                <SvelteMarkdown source={message.chat_data} />
-                            </CardText>
-                        </CardBody>
-                        <CardFooter>{new Intl.DateTimeFormat('ko-KR', {
-                            year: 'numeric',
-                            month: 'numeric',
-                            day: 'numeric',
-                            hour: 'numeric',
-                            minute: 'numeric',
-                            second: 'numeric'
-                        }).format(message.timestamp)}</CardFooter>
-                    </Card>
+                    <UserChat message={message} />
                 {:else if message.chat_type == 1}
-                    <Card style="margin-right: 20%; margin-bottom: 20px;">
-                        <CardHeader>
-                            <CardTitle>{mentor_detail.mentor_name}</CardTitle>
-                        </CardHeader>
-                        <CardBody>
-                            <CardText>
-                                <SvelteMarkdown source={message.chat_data} />
-                            </CardText>
-                        </CardBody>
-                        <CardFooter>{new Intl.DateTimeFormat('ko-KR', {
-                            year: 'numeric',
-                            month: 'numeric',
-                            day: 'numeric',
-                            hour: 'numeric',
-                            minute: 'numeric',
-                            second: 'numeric'
-                        }).format(message.timestamp)}</CardFooter>
-                    </Card>
+                    <MentorChat message={message} mentor_detail={mentor_detail} />
                 {:else if message.chat_type == 2} <!-- 멘토 정보 출력 -->
-                    <Card style="margin-bottom: 20px; margin-left: 10%; margin-right: 10%; border: 1px solid #ccc; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-                        <CardHeader style="background-color: #f7f7f7; border-bottom: 1px solid #eee; padding: 16px;">
-                            <CardTitle style="text-align: center; font-size: 24px; color: #333; font-weight: bold;">멘토
-                                정보
-                            </CardTitle>
-                        </CardHeader>
-                        <CardBody style="text-align: center; padding: 20px;">
-                            <CardText
-                                    style="text-align: center; font-size: 18px; font-weight: bold; color: #555; margin-bottom: 20px;">
-                                개발에서 어려움이 있다면 말해주세요. <br/>
-                                답변 생성이 20초 정도 걸릴 수 있으니 기다려주세요!
-                            </CardText>
-
-                            <div style="text-align: left; margin-top: 20px;">
-                                <CardSubtitle style="font-size: 20px; font-weight: bold; color: #444;">멘토
-                                    이름: {mentor_detail.mentor_name}</CardSubtitle>
-                                <br/>
-                                <CardText style="font-size: 16px; color: #666;">
-                                    멘토의 분야: {fieldCodeToString(mentor_detail.mentor_field)}
-                                    <br/>
-                                    <br/>
-                                    <div style="font-size: 18px; font-weight: bold; margin-bottom: 10px;">현재 멘토링 중인 정보
-                                    </div>
-                                    <div style="font-size: 16px;">
-                                        상황:<br/>
-                                        {mentor_detail.mentor_sticc.situation}
-                                        <br/><br/>
-                                        작업: <br/>
-                                        {mentor_detail.mentor_sticc.task}
-                                        <br/><br/>
-                                        의도: <br/>
-                                        {mentor_detail.mentor_sticc.intent}
-                                        <br/><br/>
-                                        고민: <br/>
-                                        {mentor_detail.mentor_sticc.concern}
-                                        <br/><br/>
-                                        추가 정보: <br/>
-                                        {mentor_detail.mentor_sticc.calibrate}
-                                        <br/>
-                                    </div>
-                                </CardText>
-                            </div>
-                        </CardBody>
-                    </Card>
+                    <MentorInfo mentor_detail={mentor_detail} />
                 {:else if message.chat_type == 3}
-                    <Card style="margin-bottom: 20px; margin-left: 10%; margin-right: 10%;">
-                        <CardHeader>
-                            <CardTitle style="text-align: center;">이전 대화 요약</CardTitle>
-                        </CardHeader>
-                        <CardBody>
-                            <CardSubtitle style="text-align: center;"><b>대화 요약</b></CardSubtitle>
-                            <br/>
-                            <CardText>
-                                <SvelteMarkdown source={message.chat_data} />
-                            </CardText>
-                        </CardBody>
-                    </Card>
+                    <PreviousChat message={message} />
                 {:else if message.chat_type == 4}
-                    <Card style="margin-right: 20%; margin-bottom: 20px;">
-                        <CardHeader>
-                            <CardTitle>Action 수락 요청</CardTitle>
-                        </CardHeader>
-                        <CardBody>
-                            <CardSubtitle>Card subtitle</CardSubtitle>
-                            <CardText>
-                                <SvelteMarkdown source={message.chat_data} />
-                            </CardText>
-                            <Container class="d-flex justify-content-end">
-                                {#each message.candidates as candidate, index}
+                    <ActionRequestAccept message={message}>
+                        {#each message.candidates as candidate, index}
+                            <Button
+                                    class="action-button"
+                                    active={false}
+                                    block={false}
+                                    close={false}
+                                    color="secondary"
+                                    disabled={false}
+                                    outline={false}
+                                    size="md"
+                                    on:click={() => acceptAction(index, true, candidate)}
+                                    value="">{candidate}</Button>
+                        {/each}
+                        <Button
+                                active={false}
+                                block={false}
+                                close={false}
+                                color="danger"
+                                disabled={false}
+                                outline={false}
+                                size="md"
+                                on:click={() => acceptAction(index, false, null)}
+                                value="">거절하기</Button>
+                    </ActionRequestAccept>
+                {:else if message.chat_type == 5}
+                    <ActionRequestResultReport message={message}>
+                        <Form {validated} action="javascript:void(0);"
+                                on:submit={(e) =>
+									postActionResult(index, e.submitter.value, message.candidates[0], input_temp_data)}
+                              method="post">
+                            <Row>
+                                <Col>
+                                    <FormGroup
+                                            floating
+                                            label="왜 성공 / 실패 / 보류 했는지 짧게 작성해주세요."
+                                            class="form-outline mb-4">
+                                        <Input
+                                                type="text"
+                                                name="input_temp"
+                                                required
+                                                bind:value={input_temp_data}
+                                        />
+                                    </FormGroup>
+                                </Col>
+                            </Row>
+                            <Row>
+                                <Container class="d-flex justify-content-end">
                                     <Button
-                                            class=""
+                                            class="action-button"
+                                            active={false}
+                                            block={false}
+                                            close={false}
+                                            color="warning"
+                                            disabled={false}
+                                            outline={false}
+                                            size="md"
+                                            value="2">보류
+                                    </Button>
+                                    <Button
+                                            class="action-button"
+                                            active={false}
+                                            block={false}
+                                            close={false}
+                                            color="danger"
+                                            disabled={false}
+                                            outline={false}
+                                            size="md"
+                                            value="0">실패
+                                    </Button>
+                                    <Button
+                                            class="action-button"
+                                            active={false}
+                                            block={false}
+                                            close={false}
+                                            color="success"
+                                            disabled={false}
+                                            outline={false}
+                                            size="md"
+                                            value="1">완수
+                                    </Button>
+                                </Container>
+                            </Row>
+                        </Form>
+                    </ActionRequestResultReport>
+                {:else if message.chat_type == 6}
+                    <RequestFeedback message={message} feedbackTitle="Action Feedback 요청" >
+                        <Form {validated} action="javascript:void(0);"
+                                on:submit={(e) =>
+									postFeedback(index, 0, input_feedback_data)}
+                                method="post">
+                            <Row>
+                                <Col>
+                                    <FormGroup floating label="피드백을 작성해주세요." class="form-outline mb-4">
+                                        <Input
+                                                type="text"
+                                                name="input_feedback"
+                                                required
+                                                bind:value={input_feedback_data}
+                                        />
+                                    </FormGroup>
+                                </Col>
+                            </Row>
+                            <Row>
+                                <Container class="d-flex justify-content-end">
+                                    <Button
+                                            class="action-button"
                                             active={false}
                                             block={false}
                                             children=""
                                             close={false}
-                                            color="secondary"
+                                            color="primary"
                                             disabled={false}
                                             href=""
                                             outline={false}
-                                            size="md"
-                                            style="margin-right: 10px;"
-                                            on:click={() => acceptAction(index, true, candidate)}
-                                            value="">{candidate}</Button>
-                                {/each}
-                                <Button
-                                        class=""
-                                        active={false}
-                                        block={false}
-                                        children=""
-                                        close={false}
-                                        color="danger"
-                                        disabled={false}
-                                        href=""
-                                        outline={false}
-                                        size="md"
-                                        style=""
-                                        on:click={() => acceptAction(index, false, null)}
-                                        value="">거절하기
-                                </Button>
-                            </Container>
-                        </CardBody>
-                        <CardFooter>{new Intl.DateTimeFormat('ko-KR', {
-                            year: 'numeric',
-                            month: 'numeric',
-                            day: 'numeric',
-                            hour: 'numeric',
-                            minute: 'numeric',
-                            second: 'numeric'
-                        }).format(message.timestamp)}</CardFooter>
-                    </Card>
-                {:else if message.chat_type == 5}
-                    <Card style="margin-right: 20%; margin-bottom: 20px;">
-                        <CardHeader>
-                            <CardTitle>Action 결과 제출</CardTitle>
-                        </CardHeader>
-                        <CardBody>
-                            <CardText>
-                                <SvelteMarkdown source={message.chat_data} />
-                            </CardText>
-                            <Form
-                                    {validated}
-                                    action="javascript:void(0);"
-                                    on:submit={(e) =>
-									postActionResult(
-										index,
-										e.submitter.value,
-										message.candidates[0],
-										input_temp_data
-									)}
-                                    method="post">
-                                <Row>
-                                    <Col>
-                                        <FormGroup
-                                                floating
-                                                label="왜 성공 / 실패 / 보류 했는지 짧게 작성해주세요."
-                                                class="form-outline mb-4">
-                                            <Input
-                                                    type="text"
-                                                    name="input_temp"
-                                                    required
-                                                    bind:value={input_temp_data}
-                                            />
-                                        </FormGroup>
-                                    </Col>
-                                </Row>
-                                <Row>
-                                    <Container class="d-flex justify-content-end">
-                                        <Button
-                                                class=""
-                                                active={false}
-                                                block={false}
-                                                children=""
-                                                close={false}
-                                                color="warning"
-                                                disabled={false}
-                                                href=""
-                                                outline={false}
-                                                size="md"
-                                                style="margin-right: 10px;"
-                                                value="2">보류
-                                        </Button>
-                                        <Button
-                                                class=""
-                                                active={false}
-                                                block={false}
-                                                children=""
-                                                close={false}
-                                                color="danger"
-                                                disabled={false}
-                                                href=""
-                                                outline={false}
-                                                size="md"
-                                                style="margin-right: 10px;"
-                                                value="0">실패
-                                        </Button>
-                                        <Button
-                                                class=""
-                                                active={false}
-                                                block={false}
-                                                children=""
-                                                close={false}
-                                                color="success"
-                                                disabled={false}
-                                                href=""
-                                                outline={false}
-                                                size="md"
-                                                style="margin-right: 10px;"
-                                                value="1">완수
-                                        </Button>
-                                    </Container>
-                                </Row>
-                            </Form>
-                        </CardBody>
-                        <CardFooter>{new Intl.DateTimeFormat('ko-KR', {
-                            year: 'numeric',
-                            month: 'numeric',
-                            day: 'numeric',
-                            hour: 'numeric',
-                            minute: 'numeric',
-                            second: 'numeric'
-                        }).format(message.timestamp)}</CardFooter>
-                    </Card>
-                {:else if message.chat_type == 6}
-                    <Card style="margin-right: 20%; margin-bottom: 20px;">
-                        <CardHeader>
-                            <CardTitle>Action Feedback 요청</CardTitle>
-                        </CardHeader>
-                        <CardBody>
-                            <CardText>
-                                <SvelteMarkdown source={message.chat_data} />
-                            </CardText>
-                            <Form
-                                    {validated}
-                                    action="javascript:void(0);"
-                                    on:submit={(e) =>
-									postFeedback(
-										index,
-										0,
-										input_temp_data
-									)}
-                                    method="post">
-                                <Row>
-                                    <Col>
-                                        <FormGroup
-                                                floating
-                                                label="피드백을 작성해주세요."
-                                                class="form-outline mb-4">
-                                            <Input
-                                                    type="text"
-                                                    name="input_feedback"
-                                                    required
-                                                    bind:value={input_feedback_data}
-                                            />
-                                        </FormGroup>
-                                    </Col>
-                                </Row>
-                                <Row>
-                                    <Container class="d-flex justify-content-end">
-                                        <Button
-                                                class=""
-                                                active={false}
-                                                block={false}
-                                                children=""
-                                                close={false}
-                                                color="primary"
-                                                disabled={false}
-                                                href=""
-                                                outline={false}
-                                                size="md"
-                                                style="margin-right: 10px;">제출</Button>
-                                    </Container>
-                                </Row>
-                            </Form>
-                        </CardBody>
-                        <CardFooter>{new Intl.DateTimeFormat('ko-KR', {
-                            year: 'numeric',
-                            month: 'numeric',
-                            day: 'numeric',
-                            hour: 'numeric',
-                            minute: 'numeric',
-                            second: 'numeric'
-                        }).format(message.timestamp)}</CardFooter>
-                    </Card>
+                                            size="md">제출</Button>
+                                </Container>
+                            </Row>
+                        </Form>
+                    </RequestFeedback>
                 {:else if message.chat_type == 7}
-                    <Card style="margin-right: 20%; margin-bottom: 20px;">
-                        <CardHeader>
-                            <CardTitle>QnA Feedback 요청</CardTitle>
-                        </CardHeader>
-                        <CardBody>
-                            <CardText>
-                                <SvelteMarkdown source={message.chat_data} />
-                            </CardText>
-                            <Form
-                                    {validated}
-                                    action="javascript:void(0);"
-                                    on:submit={(e) =>
-									postFeedback(
-										index,
-										1,
-										input_temp_data
-									)}
-                                    method="post">
-                                <Row>
-                                    <Col>
-                                        <FormGroup
-                                                floating
-                                                label="피드백을 작성해주세요."
-                                                class="form-outline mb-4">
-                                            <Input
-                                                    type="text"
-                                                    name="input_feedback"
-                                                    required
-                                                    bind:value={input_feedback_data}
-                                            />
-                                        </FormGroup>
-                                    </Col>
-                                </Row>
-                                <Row>
-                                    <Container class="d-flex justify-content-end">
-                                        <Button
-                                                class=""
-                                                active={false}
-                                                block={false}
-                                                children=""
-                                                close={false}
-                                                color="primary"
-                                                disabled={false}
-                                                href=""
-                                                outline={false}
-                                                size="md"
-                                                style="margin-right: 10px;">제출</Button>
-                                    </Container>
-                                </Row>
-                            </Form>
-                        </CardBody>
-                        <CardFooter>{new Intl.DateTimeFormat('ko-KR', {
-                            year: 'numeric',
-                            month: 'numeric',
-                            day: 'numeric',
-                            hour: 'numeric',
-                            minute: 'numeric',
-                            second: 'numeric'
-                        }).format(message.timestamp)}</CardFooter>
-                    </Card>
+                    <RequestFeedback message={message} feedbackTitle="QnA Feedback 요청" >
+                        <Form {validated} action="javascript:void(0);"
+                                on:submit={(e) =>
+									postFeedback(index, 1, input_feedback_data)}
+                                method="post">
+                            <Row>
+                                <Col>
+                                    <FormGroup
+                                            floating
+                                            label="피드백을 작성해주세요."
+                                            class="form-outline mb-4">
+                                        <Input
+                                                type="text"
+                                                name="input_feedback"
+                                                required
+                                                bind:value={input_feedback_data}
+                                        />
+                                    </FormGroup>
+                                </Col>
+                            </Row>
+                            <Row>
+                                <Container class="d-flex justify-content-end">
+                                    <Button
+                                            class="action-button"
+                                            active={false}
+                                            block={false}
+                                            children=""
+                                            close={false}
+                                            color="primary"
+                                            disabled={false}
+                                            href=""
+                                            outline={false}
+                                            size="md">제출</Button>
+                                </Container>
+                            </Row>
+                        </Form>
+                    </RequestFeedback>
                 {:else if message.chat_type == 8}
-                    <Card style="margin-right: 20%; margin-bottom: 20px;">
-                        <CardHeader>
-                            <CardTitle>학습 방향 Feedback 요청</CardTitle>
-                        </CardHeader>
-                        <CardBody>
-                            <CardText>
-                                <SvelteMarkdown source={message.chat_data} />
-                            </CardText>
-                            <Form
-                                    {validated}
-                                    action="javascript:void(0);"
-                                    on:submit={(e) =>
-									postFeedback(
-										index,
-										2,
-										input_temp_data
-									)}
-                                    method="post">
-                                <Row>
-                                    <Col>
-                                        <FormGroup
-                                                floating
-                                                label="피드백을 작성해주세요."
-                                                class="form-outline mb-4">
-                                            <Input
-                                                    type="text"
-                                                    name="input_feedback"
-                                                    required
-                                                    bind:value={input_feedback_data}
-                                            />
-                                        </FormGroup>
-                                    </Col>
-                                </Row>
-                                <Row>
-                                    <Container class="d-flex justify-content-end">
-                                        <Button
-                                                class=""
-                                                active={false}
-                                                block={false}
-                                                children=""
-                                                close={false}
-                                                color="primary"
-                                                disabled={false}
-                                                href=""
-                                                outline={false}
-                                                size="md"
-                                                style="margin-right: 10px;">제출</Button>
-                                    </Container>
-                                </Row>
-                            </Form>
-                        </CardBody>
-                        <CardFooter>{new Intl.DateTimeFormat('ko-KR', {
-                            year: 'numeric',
-                            month: 'numeric',
-                            day: 'numeric',
-                            hour: 'numeric',
-                            minute: 'numeric',
-                            second: 'numeric'
-                        }).format(message.timestamp)}</CardFooter>
-                    </Card>
+                    <RequestFeedback message={message} feedbackTitle="학습 방향 Feedback 요청" >
+                        <Form {validated} action="javascript:void(0);"
+                                on:submit={(e) =>
+									postFeedback(index, 2, input_feedback_data)}
+                                method="post">
+                            <Row>
+                                <Col>
+                                    <FormGroup
+                                            floating
+                                            label="피드백을 작성해주세요."
+                                            class="form-outline mb-4">
+                                        <Input
+                                                type="text"
+                                                name="input_feedback"
+                                                required
+                                                bind:value={input_feedback_data}
+                                        />
+                                    </FormGroup>
+                                </Col>
+                            </Row>
+                            <Row>
+                                <Container class="d-flex justify-content-end">
+                                    <Button
+                                            class="action-button"
+                                            active={false}
+                                            block={false}
+                                            close={false}
+                                            color="primary"
+                                            disabled={false}
+                                            outline={false}
+                                            size="md">제출</Button>
+                                </Container>
+                            </Row>
+                        </Form>
+                    </RequestFeedback>
                 {:else}
                     <Card style="margin-right: 20%; margin-bottom: 20px;">
                         <CardHeader>
@@ -796,6 +566,21 @@
         </Container>
     </Form>
 </div>
+
+<style>
+    .chat-list {
+        height: 100%;
+        overflow-y: scroll;
+        margin-top: 20px;
+        padding-bottom: 200px;
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+
+    :global(.action-button) {
+        margin-right: 10px;
+    }
+</style>
 
 <!-- TODO 테스트 데이터
 let mentor_detail = {

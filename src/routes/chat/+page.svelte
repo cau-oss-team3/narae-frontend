@@ -131,8 +131,6 @@
     let chat_history = [];
 
     let input_chat_data = '';
-    let input_temp_data = '';
-    let input_feedback_data = '';
     let messagePending = writable(false);
 
     // Function to add a new message to the chat
@@ -304,209 +302,24 @@
     <div class="chat-list" bind:this={element} >
         {#each chat_history as message, index}
             {#if message.visibility}
-                {#if message.chat_type == 0}
+                {#if message.chat_type == 0} <!-- 사용자 발화 -->
                     <UserChat message={message} />
-                {:else if message.chat_type == 1}
+                {:else if message.chat_type == 1} <!-- 멘토 발화 -->
                     <MentorChat message={message} mentor_detail={mentor_detail} />
                 {:else if message.chat_type == 2} <!-- 멘토 정보 출력 -->
                     <MentorInfo mentor_detail={mentor_detail} />
-                {:else if message.chat_type == 3}
+                {:else if message.chat_type == 3} <!-- 이전 대화 요약 -->
                     <PreviousChat message={message} />
-                {:else if message.chat_type == 4}
-                    <ActionRequestAccept message={message}>
-                        {#each message.candidates as candidate, index}
-                            <Button
-                                    class="action-button"
-                                    active={false}
-                                    block={false}
-                                    close={false}
-                                    color="secondary"
-                                    disabled={false}
-                                    outline={false}
-                                    size="md"
-                                    on:click={() => acceptAction(index, true, candidate)}
-                                    value="">{candidate}</Button>
-                        {/each}
-                        <Button
-                                active={false}
-                                block={false}
-                                close={false}
-                                color="danger"
-                                disabled={false}
-                                outline={false}
-                                size="md"
-                                on:click={() => acceptAction(index, false, null)}
-                                value="">거절하기</Button>
-                    </ActionRequestAccept>
-                {:else if message.chat_type == 5}
-                    <ActionRequestResultReport message={message}>
-                        <Form {validated} action="javascript:void(0);"
-                                on:submit={(e) =>
-									postActionResult(index, e.submitter.value, message.candidates[0], input_temp_data)}
-                              method="post">
-                            <Row>
-                                <Col>
-                                    <FormGroup
-                                            floating
-                                            label="왜 성공 / 실패 / 보류 했는지 짧게 작성해주세요."
-                                            class="form-outline mb-4">
-                                        <Input
-                                                type="text"
-                                                name="input_temp"
-                                                required
-                                                bind:value={input_temp_data}
-                                        />
-                                    </FormGroup>
-                                </Col>
-                            </Row>
-                            <Row>
-                                <Container class="d-flex justify-content-end">
-                                    <Button
-                                            class="action-button"
-                                            active={false}
-                                            block={false}
-                                            close={false}
-                                            color="warning"
-                                            disabled={false}
-                                            outline={false}
-                                            size="md"
-                                            value="2">보류
-                                    </Button>
-                                    <Button
-                                            class="action-button"
-                                            active={false}
-                                            block={false}
-                                            close={false}
-                                            color="danger"
-                                            disabled={false}
-                                            outline={false}
-                                            size="md"
-                                            value="0">실패
-                                    </Button>
-                                    <Button
-                                            class="action-button"
-                                            active={false}
-                                            block={false}
-                                            close={false}
-                                            color="success"
-                                            disabled={false}
-                                            outline={false}
-                                            size="md"
-                                            value="1">완수
-                                    </Button>
-                                </Container>
-                            </Row>
-                        </Form>
-                    </ActionRequestResultReport>
-                {:else if message.chat_type == 6}
-                    <RequestFeedback message={message} feedbackTitle="Action Feedback 요청" >
-                        <Form {validated} action="javascript:void(0);"
-                                on:submit={(e) =>
-									postFeedback(index, 0, input_feedback_data)}
-                                method="post">
-                            <Row>
-                                <Col>
-                                    <FormGroup floating label="피드백을 작성해주세요." class="form-outline mb-4">
-                                        <Input
-                                                type="text"
-                                                name="input_feedback"
-                                                required
-                                                bind:value={input_feedback_data}
-                                        />
-                                    </FormGroup>
-                                </Col>
-                            </Row>
-                            <Row>
-                                <Container class="d-flex justify-content-end">
-                                    <Button
-                                            class="action-button"
-                                            active={false}
-                                            block={false}
-                                            children=""
-                                            close={false}
-                                            color="primary"
-                                            disabled={false}
-                                            href=""
-                                            outline={false}
-                                            size="md">제출</Button>
-                                </Container>
-                            </Row>
-                        </Form>
-                    </RequestFeedback>
-                {:else if message.chat_type == 7}
-                    <RequestFeedback message={message} feedbackTitle="QnA Feedback 요청" >
-                        <Form {validated} action="javascript:void(0);"
-                                on:submit={(e) =>
-									postFeedback(index, 1, input_feedback_data)}
-                                method="post">
-                            <Row>
-                                <Col>
-                                    <FormGroup
-                                            floating
-                                            label="피드백을 작성해주세요."
-                                            class="form-outline mb-4">
-                                        <Input
-                                                type="text"
-                                                name="input_feedback"
-                                                required
-                                                bind:value={input_feedback_data}
-                                        />
-                                    </FormGroup>
-                                </Col>
-                            </Row>
-                            <Row>
-                                <Container class="d-flex justify-content-end">
-                                    <Button
-                                            class="action-button"
-                                            active={false}
-                                            block={false}
-                                            children=""
-                                            close={false}
-                                            color="primary"
-                                            disabled={false}
-                                            href=""
-                                            outline={false}
-                                            size="md">제출</Button>
-                                </Container>
-                            </Row>
-                        </Form>
-                    </RequestFeedback>
-                {:else if message.chat_type == 8}
-                    <RequestFeedback message={message} feedbackTitle="학습 방향 Feedback 요청" >
-                        <Form {validated} action="javascript:void(0);"
-                                on:submit={(e) =>
-									postFeedback(index, 2, input_feedback_data)}
-                                method="post">
-                            <Row>
-                                <Col>
-                                    <FormGroup
-                                            floating
-                                            label="피드백을 작성해주세요."
-                                            class="form-outline mb-4">
-                                        <Input
-                                                type="text"
-                                                name="input_feedback"
-                                                required
-                                                bind:value={input_feedback_data}
-                                        />
-                                    </FormGroup>
-                                </Col>
-                            </Row>
-                            <Row>
-                                <Container class="d-flex justify-content-end">
-                                    <Button
-                                            class="action-button"
-                                            active={false}
-                                            block={false}
-                                            close={false}
-                                            color="primary"
-                                            disabled={false}
-                                            outline={false}
-                                            size="md">제출</Button>
-                                </Container>
-                            </Row>
-                        </Form>
-                    </RequestFeedback>
+                {:else if message.chat_type == 4} <!-- Acion 수락요청 -->
+                    <ActionRequestAccept message={message} index={index} onSubmit={acceptAction} />
+                {:else if message.chat_type == 5} <!-- Acion 결과 제출 요청 -->
+                    <ActionRequestResultReport message={message} index={index} onSubmit={postActionResult} />
+                {:else if message.chat_type == 6} <!-- Acion Feedback 요청 -->
+                    <RequestFeedback message={message} feedbackTitle="Action Feedback 요청" index={index} onSubmit={postFeedback} />
+                {:else if message.chat_type == 7} <!-- QnA Feedback 요청 -->
+                    <RequestFeedback message={message} feedbackTitle="QnA Feedback 요청" index={index} onSubmit={postFeedback} />
+                {:else if message.chat_type == 8} <!-- 학습 방향 Feedback 요청 -->
+                    <RequestFeedback message={message} feedbackTitle="학습 방향 Feedback 요청" index={index} onSubmit={postFeedback} />
                 {:else}
                     <Card style="margin-right: 20%; margin-bottom: 20px;">
                         <CardHeader>

@@ -138,6 +138,10 @@
 	}
 </script>
 
+<svelte:head>
+	<title>멘토 리스트</title>
+</svelte:head>
+
 <Container fluid>
 	{#each mentors as mentor, index}
 		<Card>

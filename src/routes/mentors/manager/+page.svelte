@@ -207,6 +207,14 @@
 	}
 </script>
 
+<svelte:head>
+	{#if id != null}
+		<title>멘토 정보 수정</title>
+	{:else}
+		<title>멘토 생성</title>
+	{/if}
+</svelte:head>
+
 <Container class="py-5 h-100">
 	<Row class="d-flex">
 		<Card class="shadow-2-strong" style="border-radius: 1rem; margin-bottom: 30px;">

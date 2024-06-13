@@ -31,6 +31,7 @@
     import ActionRequestResultReport from "./ActionRequestResultReport.svelte";
     import RequestFeedback from "./RequestFeedback.svelte";
 
+    let title = '대화하기';
     let id = '';
     let ws = null;
     let userDataValue;
@@ -180,6 +181,8 @@
         if (json.isSuccess) {
             mentor_detail = json.mentor_detail;
             chat_history = json.chat_history;
+
+            title = '대화하기 > ' + mentor_detail.mentor_name;
         } else {
             alertData.set({code: res.status, err: json.err});
         }
@@ -297,6 +300,10 @@
         }
     }
 </script>
+
+<svelte:head>
+    <title>{title}</title>
+</svelte:head>
 
 <div id="chat_container" class="container-fluid" style="height: 75vh;">
     <div class="chat-list" bind:this={element} >

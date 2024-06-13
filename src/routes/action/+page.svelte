@@ -143,6 +143,10 @@
 
 </script>
 
+<svelte:head>
+    <title>수락한 Action 리스트</title>
+</svelte:head>
+
 <Container fluid>
     {#each actionList as action}
         <Card>

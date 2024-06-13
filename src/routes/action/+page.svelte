@@ -17,6 +17,7 @@
     let id = '';
     let userDataValue;
     let actionList = [];
+    let motivation = '';
     let actionRecommendList = [];
 
     let validated = false;
@@ -49,22 +50,20 @@
 
     // get Action List
     async function getActionList() {
-        const res = await fetch(PUBLIC_API_SERVER + '/action/current/' + id, {
+        const res = await fetch(PUBLIC_API_SERVER + '/prompt/' + id + '/daily-actions', {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': userDataValue.token
-            }
+            },
         });
 
         const json = await res.json();
-        console.log("Action List:", json);
-
-        if (json.isSuccess) {
-            actionList = json.action_list;
-        } else {
+        if (!res.ok) {
             alertData.set({code: res.status, err: json.err});
         }
+        actionList = json;
+        console.log("Action List:", actionList);
     }
 
     // Action Accept
@@ -122,23 +121,32 @@
 
     // get Recommend Action
     async function recommendAction() {
-        const res = await fetch(PUBLIC_API_SERVER + '/action/recommend/' + id, {
-            method: 'GET',
+        const res = await fetch(PUBLIC_API_SERVER + '/prompt/' + id + '/action-suggestion', {
+            method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': userDataValue.token
-            }
+            },
+            body: JSON.stringify({hint: ""})
         });
 
         const json = await res.json();
-        console.log("Action Recommend List:", json);
 
-        if (json.isSuccess) {
-            actionRecommendList = json.action_list;
-            open = true;
-        } else {
+        if (!res.ok) {
             alertData.set({code: res.status, err: json.err});
         }
+
+        for (const key in json) {
+            console.log(key);
+            if (key.startsWith('ACTION') && key !== 'ACTIONS') {
+                actionList.push(json[key]);
+            }
+        }
+        console.log("Action Recommend List:", actionList);
+
+        actionRecommendList = json.actions;
+        motivation = json.motivation;
+        open = true;
     }
 
 </script>
@@ -146,69 +154,82 @@
 <svelte:head>
     <title>수락한 Action 리스트</title>
 </svelte:head>
-
 <Container fluid>
     {#each actionList as action}
         <Card>
-            <CardBody>
-                <CardTitle>{action}</CardTitle>
-
+            <CardBody style="background-color: {action.is_done === false ? '#f0f0f0' : 'transparent'};">
+                <CardTitle>{action.action}</CardTitle>
                 <Form {validated} action="javascript:void(0);"
                       on:submit={(e) =>
 									postActionResult(e.submitter.value, action)}
                       method="post">
-                    <Row>
-                        <Col>
-                            <FormGroup
-                                    floating
-                                    label="왜 성공 / 실패 / 보류 했는지 짧게 작성해주세요."
-                                    class="form-outline mb-4">
-                                <Input
-                                        type="text"
-                                        name="input_temp"
-                                        required
-                                        bind:value={input_temp_data}
-                                />
-                            </FormGroup>
-                        </Col>
-                    </Row>
-                    <Row>
-                        <Container class="d-flex justify-content-end">
-                            <Button
-                                    class="action-button"
-                                    active={false}
-                                    block={false}
-                                    close={false}
-                                    color="warning"
-                                    disabled={false}
-                                    outline={false}
-                                    size="md"
-                                    value="2">보류
-                            </Button>
-                            <Button
-                                    class="action-button"
-                                    active={false}
-                                    block={false}
-                                    close={false}
-                                    color="danger"
-                                    disabled={false}
-                                    outline={false}
-                                    size="md"
-                                    value="0">실패
-                            </Button>
-                            <Button
-                                    class="action-button"
-                                    active={false}
-                                    block={false}
-                                    close={false}
-                                    color="success"
-                                    disabled={false}
-                                    outline={false}
-                                    size="md"
-                                    value="1">완수
-                            </Button>
-                        </Container>
-                    </Row>
+                    {#if action.is_active === false && action.is_done === false}
+                        <Row>
+                            <Col>
+                                <FormGroup
+                                        floating
+                                        label="포기한 Action입니다."
+                                        class="form-outline mb-4">
+                                    <Input
+                                            type="text"
+                                            name="input_temp"
+                                            required
+                                            bind:value={input_temp_data}
+                                            style="background-color: #e0e0e0; color: #a0a0a0;"
+                                            disabled
+                                    />
+                                </FormGroup>
+                            </Col>
+                        </Row>
+                    {:else if action.is_active === false && action.is_done === true}
+                        <Row>
+                            <Col>
+                                <p>{action.feedback}</p>
+                            </Col>
+                        </Row>
+                    {:else}
+                        <Row>
+                            <Col>
+                                <FormGroup
+                                        floating
+                                        label="Action을 수행하셨나요? 짧은 후기를 작성해주세요."
+                                        class="form-outline mb-4">
+                                    <Input
+                                            type="text"
+                                            name="input_temp"
+                                            required
+                                            bind:value={input_temp_data}
+                                    />
+                                </FormGroup>
+                            </Col>
+                        </Row>
+                        <Row>
+                            <Container class="d-flex justify-content-end">
+                                <Button
+                                        class="action-button"
+                                        active={false}
+                                        block={false}
+                                        close={false}
+                                        color="danger"
+                                        disabled={false}
+                                        outline={false}
+                                        size="md"
+                                        value="0">실패
+                                </Button>
+                                <Button
+                                        class="action-button"
+                                        active={false}
+                                        block={false}
+                                        close={false}
+                                        color="success"
+                                        disabled={false}
+                                        outline={false}
+                                        size="md"
+                                        value="1">완수
+                                </Button>
+                            </Container>
+                        </Row>
+                    {/if}
                 </Form>
             </CardBody>
         </Card>
@@ -227,13 +248,13 @@
             </ModalBody>
             <ModalFooter>
                 {#each actionRecommendList as recommendAction}
-                <Button
-                        color="info"
-                        on:click={() => {
+                    <Button
+                            color="info"
+                            on:click={() => {
 								toggle();
 								acceptAction(true, recommendAction);
 							}}>{recommendAction}</Button
-                >
+                    >
                 {/each}
                 <Button color="secondary" on:click={() => toggle()}>취소</Button>
             </ModalFooter>
@@ -260,6 +281,7 @@
         margin-right: 10px;
     }
 </style>
+
 
 
 <!-- TODO 테스트 데이터

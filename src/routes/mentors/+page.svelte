@@ -104,6 +104,20 @@
 		}
 	};
 
+	// Action - list 페이지로 보내기
+	const goToActionList = (id) => {
+		if (id != null) {
+			goto(base + '/action?id=' + id); //Action 관리 페이지로 넘겨줌
+		}
+	};
+
+	// Curriculum - 커리큘럼 관리 페이지로 보내기
+	const goToCurriculumList = (id) => {
+		if (id != null) {
+			goto(base + '/curriculum?id=' + id); //커리큘럼 관리 페이지로 넘겨줌
+		}
+	};
+
 	// mentor 삭제
 	async function removeMentor(id) {
 		const res = await fetch(PUBLIC_API_SERVER + '/mentors2/' + id, {
@@ -136,6 +150,35 @@
 					<br />
 					<CardText>{mentor.daily_action}</CardText>
 				{/if}
+				<Button
+						class=""
+						active={false}
+						block={false}
+						children=""
+						close={false}
+						color="warning"
+						disabled={false}
+						href=""
+						outline={false}
+						size="md"
+						on:click={() => goToActionList(mentor.id)}
+						value="">Action 관리하기</Button
+				>
+				<Button
+						class=""
+						active={false}
+						block={false}
+						children=""
+						close={false}
+						color="info"
+						disabled={false}
+						href=""
+						outline={false}
+						size="md"
+						style="margin-left: 10px;"
+						on:click={() => goToCurriculumList(mentor.id)}
+						value="">학습 방향 관리하기</Button
+				>
 			</CardBody>
 			<CardFooter class="d-flex justify-content-end">
 				<Modal isOpen={open[index]} backdrop={false}>

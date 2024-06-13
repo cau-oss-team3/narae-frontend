@@ -24,6 +24,7 @@
     let input_temp_data = '';
 
     let open = false;
+    let loading = false;
 
     const toggle = () => {
         open = !open;
@@ -121,6 +122,9 @@
 
     // get Recommend Action
     async function recommendAction() {
+        open = true;
+        loading = true;
+
         const res = await fetch(PUBLIC_API_SERVER + '/prompt/' + id + '/action-suggestion', {
             method: 'POST',
             headers: {
@@ -131,9 +135,10 @@
         });
 
         const json = await res.json();
-
         if (!res.ok) {
             alertData.set({code: res.status, err: json.err});
+            loading = false;
+            return;
         }
 
         for (const key in json) {
@@ -146,15 +151,44 @@
 
         actionRecommendList = json.actions;
         motivation = json.motivation;
-        open = true;
+        loading = false;
     }
-
 </script>
 
 <svelte:head>
     <title>수락한 Action 리스트</title>
 </svelte:head>
+
 <Container fluid>
+    <style>
+        .modal-body {
+            padding: 20px;
+        }
+
+        .modal-footer {
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .button-container {
+            margin-top: 20px;
+            padding-bottom: 20px;
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .motivation-text {
+            margin-top: 20px;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        :global(.action-button) {
+            margin-right: 10px;
+        }
+    </style>
+
     {#each actionList as action}
         <Card>
             <CardBody style="background-color: {action.is_done === false ? '#f0f0f0' : 'transparent'};">
@@ -233,59 +267,40 @@
                 </Form>
             </CardBody>
         </Card>
-        <br />
+        <br/>
     {/each}
 
-    <Container
-            fluid
-            class="d-flex justify-content-end"
-            style="margin-top: 30px; padding-bottom: 30px;"
-    >
-        <Modal isOpen={open} backdrop={false}>
+    <Container fluid class="button-container">
+        <Modal isOpen={open} backdrop={true}>
             <ModalHeader>Action 추천</ModalHeader>
-            <ModalBody>
-                수락할 Action을 선택해 주세요.
+            <ModalBody class="modal-body">
+                {#if loading}
+                    <div>불러오는 중입니다. 잠시만 기다려주세요.</div>
+                {:else}
+                    <div class="motivation-text">
+                        {motivation}
+                    </div>
+                    <div style="margin-bottom: 20px; margin-top: 30px">추천 Action 리스트(하나를 선택하세요.)</div>
+                    {#each actionRecommendList as recommendAction}
+                        <Button
+                                color="info"
+                                on:click={() => {
+                                toggle();
+                                acceptAction(true, recommendAction);
+                            }}
+                                style="margin: 5px 0;"
+                        >{recommendAction}</Button>
+                    {/each}
+                {/if}
             </ModalBody>
-            <ModalFooter>
-                {#each actionRecommendList as recommendAction}
-                    <Button
-                            color="info"
-                            on:click={() => {
-								toggle();
-								acceptAction(true, recommendAction);
-							}}>{recommendAction}</Button
-                    >
-                {/each}
+            <ModalFooter class="modal-footer">
                 <Button color="secondary" on:click={() => toggle()}>취소</Button>
             </ModalFooter>
         </Modal>
         <Button
-                class=""
-                active={false}
-                block={false}
-                children=""
-                close={false}
                 color="primary"
-                disabled={false}
-                href=""
-                outline={false}
-                size="md"
                 on:click={() => recommendAction()}
-                value="">Action 추천받기</Button
-        >
+        >Action 추천받기
+        </Button>
     </Container>
 </Container>
-
-<style>
-    :global(.action-button) {
-        margin-right: 10px;
-    }
-</style>
-
-
-
-<!-- TODO 테스트 데이터
-let actionList = ['수락한 Action 1', '수락한 Action 2', '수락한 Action 3'];
-
-let actionRecommendList = ['내일을 위한 Action', '당신을 위한 위한 Action', '오늘 당장 할 수 있는 Action'];
-!-->

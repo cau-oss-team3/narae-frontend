@@ -1,4 +1,3 @@
-<!-- TODO 개발 -->
 <script>
     import {onDestroy, onMount} from 'svelte';
     import {page} from '$app/stores';

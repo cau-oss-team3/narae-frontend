@@ -120,7 +120,6 @@
             success: isSuccess,
             comment: input_data
         };
-        console.log(data);
         const res = await fetch(PUBLIC_API_SERVER + '/prompt/' + id +'/daily-actions/current', {
             method: 'PATCH',
             headers: {
@@ -132,7 +131,7 @@
 
         const json = await res.json();
         if (!res.ok) {
-            alertData.set({code: res.status, err: json});
+            alertData.set({code: res.status, err: json.detail});
         }
 
         await getActionList();

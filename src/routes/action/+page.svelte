@@ -25,6 +25,7 @@
 
     let open = false;
     let loading = false;
+    let actionLoading = false;
 
     const toggle = () => {
         open = !open;
@@ -64,7 +65,6 @@
             alertData.set({code: res.status, err: json.err});
         }
         actionList = json;
-        console.log("Action List:", actionList);
     }
 
     // Action Accept
@@ -91,16 +91,15 @@
     }
 
     // Action Result
-    async function postActionResult(resultCode, candidate) {
+    async function postActionResult(input_data, isSuccess) {
+        actionLoading = true;
         const data = {
-            id: id,
-            result_code: resultCode,
-            action: candidate,
-            chat_data: input_temp_data
+            success: isSuccess,
+            comment: input_data
         };
-
-        const res = await fetch(PUBLIC_API_SERVER + '/action/result', {
-            method: 'POST',
+        console.log(data);
+        const res = await fetch(PUBLIC_API_SERVER + '/prompt/' + id +'/daily-actions/current', {
+            method: 'PATCH',
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': userDataValue.token
@@ -109,12 +108,12 @@
         });
 
         const json = await res.json();
-
-        if (json.isSuccess) {
-            await getActionList();
-        } else {
-            alertData.set({code: res.status, err: json.err});
+        if (!res.ok) {
+            alertData.set({code: res.status, err: json});
         }
+
+        await getActionList();
+        actionLoading = false;
     }
 
     // get Recommend Action
@@ -139,12 +138,10 @@
         }
 
         for (const key in json) {
-            console.log(key);
             if (key.startsWith('ACTION') && key !== 'ACTIONS') {
                 actionList.push(json[key]);
             }
         }
-        console.log("Action Recommend List:", actionList);
 
         actionRecommendList = json.actions;
         motivation = json.motivation;
@@ -229,7 +226,6 @@
                                             type="text"
                                             name="input_temp"
                                             required
-                                            bind:value={input_temp_data}
                                             style="background-color: #e9ecef; color: #6c757d;"
                                             disabled
                                     />
@@ -255,12 +251,14 @@
                                 </FormGroup>
                             </Col>
                         </Row>
-                        <Row>
-                            <Container class="d-flex justify-content-end">
-                                <Button class="action-button" color="danger" value="0">실패</Button>
-                                <Button class="action-button" color="success" value="1">완수</Button>
-                            </Container>
-                        </Row>
+                        <Container class="d-flex justify-content-end">
+                            {#if actionLoading}
+                                <div class="loading-indicator">처리 중입니다...</div>
+                            {:else}
+                                <Button class="action-button" color="danger" on:click={() => postActionResult(input_temp_data, false)}>실패</Button>
+                                <Button class="action-button" color="success" on:click={() => postActionResult(input_temp_data, true)}>완수</Button>
+                            {/if}
+                        </Container>
                     {/if}
                 </Form>
             </CardBody>

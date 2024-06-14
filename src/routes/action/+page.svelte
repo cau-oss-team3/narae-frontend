@@ -46,8 +46,31 @@
             return;
         }
 
+        let curriculum = await getCurriculum();
+        if (curriculum === null || curriculum === undefined || curriculum.trim().length === 0) {
+            alert('해당 멘토의 커리큘럼이 없습니다. 커리큘럼을 먼저 생성해주세요.');
+            await goto('/mentors');
+            return;
+        }
         await getActionList();
+
     });
+
+    async function getCurriculum() {
+        const res = await fetch(PUBLIC_API_SERVER + '/prompt/' + id + '/curriculum', {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': userDataValue.token
+            },
+        });
+
+        const json = await res.json();
+        if (!res.ok) {
+            alertData.set({code: res.status, err: json});
+        }
+        return json["CURRICULUM"];
+    }
 
     // get Action List
     async function getActionList() {

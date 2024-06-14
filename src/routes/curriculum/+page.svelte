@@ -42,7 +42,7 @@
         }
     });
 
-    // Action Result
+    // Get Curriculum
     async function getCurriculum() {
         const res = await fetch(PUBLIC_API_SERVER + '/prompt/' + id + '/curriculum', {
             method: 'GET',
@@ -58,10 +58,9 @@
         }
         curriculum = json["CURRICULUM"];
         curriculum_phase = json["PHASE"];
-        console.log(curriculum_phase);
     }
 
-    // get Recommend Action
+    // Create New Curriculum
     async function generateCurriculum() {
         loading = true;
 

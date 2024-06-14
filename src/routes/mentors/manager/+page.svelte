@@ -247,7 +247,7 @@
 	<Row class="d-flex justify-content-center">
 		<Card class="shadow-2-strong card-container">
 			<div class="card-header text-center">
-				<h3>{id != null ? '멘토 정보 수정' : '멘토 생성'}</h3>
+				<h3>{id != null ? '멘토 정보 수정' : '나만의 멘토를 생성해보세요'}</h3>
 			</div>
 			<CardBody class="card-body text-center">
 				<Form
@@ -269,7 +269,7 @@
 								/>
 							</FormGroup>
 
-							<h5 class="section-title">분야 선택</h5>
+							<h5 class="section-title">분야 선택 (하나만 선택)</h5>
 							<FormGroup class="form-group">
 								<Input
 										type="checkbox"
@@ -286,8 +286,8 @@
 							</FormGroup>
 						</li>
 						<li class="list-group-item">
-							<h5 class="section-title">STICC</h5>
-							<FormGroup floating label="나의 상황을 입력하세요." class="form-group">
+							<h5 class="section-title">자세히 작성해주시면 멘토님께 도움이 됩니다.</h5>
+							<FormGroup floating label="[상황] 현재 상황을 설명해 주세요." class="form-group">
 								<Input
 										type="textarea"
 										name="situation"
@@ -297,7 +297,7 @@
 								/>
 							</FormGroup>
 
-							<FormGroup floating label="나의 작업을 입력하세요." class="form-group">
+							<FormGroup floating label="[작업] 수행하고 싶은 작업을 말해 주세요." class="form-group">
 								<Input
 										type="textarea"
 										name="task"
@@ -307,7 +307,7 @@
 								/>
 							</FormGroup>
 
-							<FormGroup floating label="무엇을 하고 싶은지 의도를 입력하세요." class="form-group">
+							<FormGroup floating label="[목적] 이 작업의 목적이나 의도를 알려 주세요." class="form-group">
 								<Input
 										type="textarea"
 										name="intent"
@@ -317,7 +317,7 @@
 								/>
 							</FormGroup>
 
-							<FormGroup floating label="이것을 할 때 걱정되는 부분을 입력하세요." class="form-group">
+							<FormGroup floating label="[걱정] 걱정되는 부분이 있나요? (ex. 최신 자바 문법을 모릅니다.)" class="form-group">
 								<Input
 										type="textarea"
 										name="concern"
@@ -327,7 +327,7 @@
 								/>
 							</FormGroup>
 
-							<FormGroup floating label="이제 도움을 줄텐데 추가로 궁금한 것을 입력하세요." class="form-group">
+							<FormGroup floating label="[조율] 추가로 알아야 할 사항이나 요청하고 싶은 것이 있다면 말씀해 주세요." class="form-group">
 								<Input
 										type="textarea"
 										name="calibrate"

@@ -140,11 +140,24 @@
 
 <svelte:head>
 	<title>멘토 리스트</title>
+	<style>
+		.card-buttons {
+			margin-top: 10px;
+			margin-right: 10px;
+		}
+		.action-buttons {
+			margin-right: 10px;
+		}
+		.btn-custom {
+			margin: 5px;
+			padding: 10px 15px;
+		}
+	</style>
 </svelte:head>
 
 <Container fluid>
 	{#each mentors as mentor, index}
-		<Card>
+		<Card class="mb-3">
 			<CardHeader>
 				<CardTitle>{mentor.name}</CardTitle>
 			</CardHeader>
@@ -154,35 +167,16 @@
 					<br />
 					<CardText>{mentor.daily_action}</CardText>
 				{/if}
-				<Button
-						class=""
-						active={false}
-						block={false}
-						children=""
-						close={false}
-						color="warning"
-						disabled={false}
-						href=""
-						outline={false}
-						size="md"
-						on:click={() => goToActionList(mentor.id)}
-						value="">Action 관리하기</Button
-				>
-				<Button
-						class=""
-						active={false}
-						block={false}
-						children=""
-						close={false}
-						color="info"
-						disabled={false}
-						href=""
-						outline={false}
-						size="md"
-						style="margin-left: 10px;"
-						on:click={() => goToCurriculumList(mentor.id)}
-						value="">학습 방향 관리하기</Button
-				>
+				<div class="card-buttons">
+					<Button
+							class="btn-custom"
+							color="primary"
+							on:click={() => goToCurriculumList(mentor.id)}>학습 방향 관리하기</Button>
+					<Button
+							class="btn-custom"
+							color="secondary"
+							on:click={() => goToActionList(mentor.id)}>Action 관리하기</Button>
+				</div>
 			</CardBody>
 			<CardFooter class="d-flex justify-content-end">
 				<Modal isOpen={open[index]} backdrop={false}>
@@ -192,83 +186,38 @@
 					</ModalBody>
 					<ModalFooter>
 						<Button
-							color="danger"
-							on:click={() => {
+								color="danger"
+								on:click={() => {
 								toggle(index);
 								removeMentor(mentor.id);
-							}}>삭제</Button
-						>
+							}}>삭제</Button>
 						<Button color="secondary" on:click={() => toggle(index)}>취소</Button>
 					</ModalFooter>
 				</Modal>
 				<Button
-					class=""
-					active={false}
-					block={false}
-					children=""
-					close={false}
-					color="danger"
-					disabled={false}
-					href=""
-					outline={false}
-					size="md"
-					style=""
-					on:click={() => (open[index] = true)}
-					value="">삭제</Button
-				>
+						class="btn-custom action-buttons"
+						color="danger"
+						on:click={() => (open[index] = true)}>삭제</Button>
 				<Button
-					class=""
-					active={false}
-					block={false}
-					children=""
-					close={false}
-					color="success"
-					disabled={false}
-					href=""
-					outline={false}
-					size="md"
-					style="margin-left: 10px;"
-					on:click={() => goToEditMentor(mentor.id)}
-					value="">수정</Button
-				>
+						class="btn-custom action-buttons"
+						color="success"
+						on:click={() => goToEditMentor(mentor.id)}>수정</Button>
 				<Button
-					class=""
-					active={false}
-					block={false}
-					children=""
-					close={false}
-					color="primary"
-					disabled={false}
-					href=""
-					outline={false}
-					size="md"
-					style="margin-left: 10px;"
-					on:click={() => goToChat(mentor.id)}
-					value="">대화하기</Button
-				>
+						class="btn-custom action-buttons"
+						color="info"
+						on:click={() => goToChat(mentor.id)}>대화하기</Button>
 			</CardFooter>
 		</Card>
-		<br />
 	{/each}
 
 	<Container
-		fluid
-		class="d-flex justify-content-end"
-		style="margin-top: 30px; padding-bottom: 30px;"
+			fluid
+			class="d-flex justify-content-end"
+			style="margin-top: 30px; padding-bottom: 30px;"
 	>
 		<Button
-			class=""
-			active={false}
-			block={false}
-			children=""
-			close={false}
-			color="secondary"
-			disabled={false}
-			href=""
-			outline={false}
-			size="md"
-			on:click={() => goToCreateMentor()}
-			value="">멘토 추가하기</Button
-		>
+				class="btn-custom"
+				color="primary"
+				on:click={() => goToCreateMentor()}>멘토 추가하기</Button>
 	</Container>
 </Container>

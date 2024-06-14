@@ -20,6 +20,7 @@
 	import { PUBLIC_API_SERVER } from '$env/static/public';
 	import {onDestroy, onMount} from 'svelte';
 	import {userData} from "$lib/auth.js";
+	import SvelteMarkdown from "svelte-markdown";
 
 	let userDataValue;
 	const unsubscribeUserData = userData.subscribe((value) => {
@@ -172,7 +173,7 @@
 			<CardBody>
 				{#if mentor.daily_action != null}
 					<CardSubtitle class="card-subtitle">Daily Action</CardSubtitle>
-					<CardText class="card-text">{mentor.daily_action.action}</CardText>
+					<CardText class="card-text"><SvelteMarkdown source={mentor.daily_action.action} /></CardText>
 				{/if}
 				<div class="card-buttons">
 					<Button

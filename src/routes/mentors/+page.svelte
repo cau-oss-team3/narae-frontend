@@ -73,13 +73,9 @@
 		const json = await res.json();
 
 		if (json.isSuccess) {
-			/* TODO 삭제
-            open = Array.from({length: dummyMentors.length}, () => false);
-            mentors = dummyMentors;
-             */
-
 			open = Array.from({ length: json.mentors.length }, () => false);
 			mentors = json.mentors;
+			console.log(json);
 		} else {
 			alertData.set({ code: res.status, err: json.err });
 		}
@@ -137,20 +133,32 @@
 		}
 	}
 </script>
-
 <svelte:head>
 	<title>멘토 리스트</title>
 	<style>
 		.card-buttons {
 			margin-top: 10px;
-			margin-right: 10px;
 		}
 		.action-buttons {
-			margin-right: 10px;
+			margin-left: 10px;
 		}
 		.btn-custom {
 			margin: 5px;
 			padding: 10px 15px;
+			border-radius: 5px;
+		}
+		.card-subtitle {
+			font-size: 1.25rem;
+			font-weight: 500;
+			margin-bottom: 10px;
+			color: #6c757d;
+		}
+		.card-text {
+			font-size: 1rem;
+			margin-bottom: 20px;
+		}
+		.card-footer-buttons {
+			margin-left: 10px;
 		}
 	</style>
 </svelte:head>
@@ -163,9 +171,8 @@
 			</CardHeader>
 			<CardBody>
 				{#if mentor.daily_action != null}
-					<CardSubtitle>Daily Action</CardSubtitle>
-					<br />
-					<CardText>{mentor.daily_action}</CardText>
+					<CardSubtitle class="card-subtitle">Daily Action</CardSubtitle>
+					<CardText class="card-text">{mentor.daily_action.action}</CardText>
 				{/if}
 				<div class="card-buttons">
 					<Button
@@ -200,11 +207,11 @@
 						on:click={() => (open[index] = true)}>삭제</Button>
 				<Button
 						class="btn-custom action-buttons"
-						color="success"
+						color="warning"
 						on:click={() => goToEditMentor(mentor.id)}>수정</Button>
 				<Button
 						class="btn-custom action-buttons"
-						color="info"
+						color="success"
 						on:click={() => goToChat(mentor.id)}>대화하기</Button>
 			</CardFooter>
 		</Card>
@@ -213,11 +220,10 @@
 	<Container
 			fluid
 			class="d-flex justify-content-end"
-			style="margin-top: 30px; padding-bottom: 30px;"
-	>
+			style="margin-top: 30px; padding-bottom: 30px;">
 		<Button
 				class="btn-custom"
-				color="primary"
+				color="info"
 				on:click={() => goToCreateMentor()}>멘토 추가하기</Button>
 	</Container>
 </Container>

@@ -68,14 +68,12 @@
     }
 
     // Action Accept
-    async function acceptAction(isAccept, candidate) {
+    async function acceptAction(candidate) {
         const data = {
-            id: id,
-            is_accept: isAccept,
             action: candidate
         };
 
-        const res = await fetch(PUBLIC_API_SERVER + '/action/accept', {
+        const res = await fetch(PUBLIC_API_SERVER + '/prompt/' + id + '/daily-actions/current', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -85,12 +83,11 @@
         });
 
         const json = await res.json();
-
-        if (json.isSuccess) {
-            await getActionList();
-        } else {
+        if (!res.ok) {
             alertData.set({code: res.status, err: json.err});
         }
+
+        await getActionList();
     }
 
     // Action Result
@@ -159,6 +156,7 @@
     <title>수락한 Action 리스트</title>
 </svelte:head>
 
+
 <Container fluid>
     <style>
         .modal-body {
@@ -184,32 +182,55 @@
             text-align: center;
         }
 
-        :global(.action-button) {
-            margin-right: 10px;
+        .action-button {
+            margin: 5px 10px 5px 0;
+            border-radius: 5px;
+        }
+
+        .recommend-button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin: 5px 0;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .recommend-button:hover {
+            background-color: #0056b3;
+        }
+
+        .cancel-button {
+            background-color: #6c757d;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin: 5px 0;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .cancel-button:hover {
+            background-color: #5a6268;
         }
     </style>
 
     {#each actionList as action}
-        <Card>
-            <CardBody style="background-color: {action.is_done === false ? '#f0f0f0' : 'transparent'};">
-                <CardTitle>{action.action}</CardTitle>
-                <Form {validated} action="javascript:void(0);"
-                      on:submit={(e) =>
-									postActionResult(e.submitter.value, action)}
-                      method="post">
+        <Card style="margin-bottom: 20px;">
+            <CardBody style="background-color: {action.is_done === false ? '#f8f9fa' : '#ffffff'}; border: 1px solid #dee2e6; border-radius: 5px;">
+                <CardTitle style="font-weight: bold; margin-bottom: 15px;">{action.action}</CardTitle>
+                <Form {validated} action="javascript:void(0);" on:submit={(e) => postActionResult(e.submitter.value, action)} method="post">
                     {#if action.is_active === false && action.is_done === false}
                         <Row>
                             <Col>
-                                <FormGroup
-                                        floating
-                                        label="포기한 Action입니다."
-                                        class="form-outline mb-4">
+                                <FormGroup floating label="포기한 Action입니다." class="form-outline mb-4">
                                     <Input
                                             type="text"
                                             name="input_temp"
                                             required
                                             bind:value={input_temp_data}
-                                            style="background-color: #e0e0e0; color: #a0a0a0;"
+                                            style="background-color: #e9ecef; color: #6c757d;"
                                             disabled
                                     />
                                 </FormGroup>
@@ -224,10 +245,7 @@
                     {:else}
                         <Row>
                             <Col>
-                                <FormGroup
-                                        floating
-                                        label="Action을 수행하셨나요? 짧은 후기를 작성해주세요."
-                                        class="form-outline mb-4">
+                                <FormGroup floating label="Action을 수행하셨나요? 짧은 후기를 작성해주세요." class="form-outline mb-4">
                                     <Input
                                             type="text"
                                             name="input_temp"
@@ -239,35 +257,14 @@
                         </Row>
                         <Row>
                             <Container class="d-flex justify-content-end">
-                                <Button
-                                        class="action-button"
-                                        active={false}
-                                        block={false}
-                                        close={false}
-                                        color="danger"
-                                        disabled={false}
-                                        outline={false}
-                                        size="md"
-                                        value="0">실패
-                                </Button>
-                                <Button
-                                        class="action-button"
-                                        active={false}
-                                        block={false}
-                                        close={false}
-                                        color="success"
-                                        disabled={false}
-                                        outline={false}
-                                        size="md"
-                                        value="1">완수
-                                </Button>
+                                <Button class="action-button" color="danger" value="0">실패</Button>
+                                <Button class="action-button" color="success" value="1">완수</Button>
                             </Container>
                         </Row>
                     {/if}
                 </Form>
             </CardBody>
         </Card>
-        <br/>
     {/each}
 
     <Container fluid class="button-container">
@@ -277,30 +274,17 @@
                 {#if loading}
                     <div>불러오는 중입니다. 잠시만 기다려주세요.</div>
                 {:else}
-                    <div class="motivation-text">
-                        {motivation}
-                    </div>
-                    <div style="margin-bottom: 20px; margin-top: 30px">추천 Action 리스트(하나를 선택하세요.)</div>
+                    <div class="motivation-text">{motivation}</div>
+                    <div style="margin-bottom: 20px; margin-top: 30px;">추천 Action 리스트 (하나를 선택하세요.)</div>
                     {#each actionRecommendList as recommendAction}
-                        <Button
-                                color="info"
-                                on:click={() => {
-                                toggle();
-                                acceptAction(true, recommendAction);
-                            }}
-                                style="margin: 5px 0;"
-                        >{recommendAction}</Button>
+                        <Button class="recommend-button" on:click={() => { toggle(); acceptAction(recommendAction); }}>{recommendAction}</Button>
                     {/each}
                 {/if}
             </ModalBody>
             <ModalFooter class="modal-footer">
-                <Button color="secondary" on:click={() => toggle()}>취소</Button>
+                <Button class="cancel-button" on:click={() => toggle()}>취소</Button>
             </ModalFooter>
         </Modal>
-        <Button
-                color="primary"
-                on:click={() => recommendAction()}
-        >Action 추천받기
-        </Button>
+        <Button class="recommend-button" on:click={() => recommendAction()}>Action 추천받기</Button>
     </Container>
 </Container>

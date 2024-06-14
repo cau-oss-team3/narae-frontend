@@ -73,13 +73,9 @@
 		const json = await res.json();
 
 		if (json.isSuccess) {
-			/* TODO 삭제
-            open = Array.from({length: dummyMentors.length}, () => false);
-            mentors = dummyMentors;
-             */
-
 			open = Array.from({ length: json.mentors.length }, () => false);
 			mentors = json.mentors;
+			console.log(json);
 		} else {
 			alertData.set({ code: res.status, err: json.err });
 		}
@@ -104,6 +100,20 @@
 		}
 	};
 
+	// Action - list 페이지로 보내기
+	const goToActionList = (id) => {
+		if (id != null) {
+			goto(base + '/action?id=' + id); //Action 관리 페이지로 넘겨줌
+		}
+	};
+
+	// Curriculum - 커리큘럼 관리 페이지로 보내기
+	const goToCurriculumList = (id) => {
+		if (id != null) {
+			goto(base + '/curriculum?id=' + id); //커리큘럼 관리 페이지로 넘겨줌
+		}
+	};
+
 	// mentor 삭제
 	async function removeMentor(id) {
 		const res = await fetch(PUBLIC_API_SERVER + '/mentors2/' + id, {
@@ -123,19 +133,57 @@
 		}
 	}
 </script>
+<svelte:head>
+	<title>멘토 리스트</title>
+	<style>
+		.card-buttons {
+			margin-top: 10px;
+		}
+		.action-buttons {
+			margin-left: 10px;
+		}
+		.btn-custom {
+			margin: 5px;
+			padding: 10px 15px;
+			border-radius: 5px;
+		}
+		.card-subtitle {
+			font-size: 1.25rem;
+			font-weight: 500;
+			margin-bottom: 10px;
+			color: #6c757d;
+		}
+		.card-text {
+			font-size: 1rem;
+			margin-bottom: 20px;
+		}
+		.card-footer-buttons {
+			margin-left: 10px;
+		}
+	</style>
+</svelte:head>
 
 <Container fluid>
 	{#each mentors as mentor, index}
-		<Card>
+		<Card class="mb-3">
 			<CardHeader>
 				<CardTitle>{mentor.name}</CardTitle>
 			</CardHeader>
 			<CardBody>
 				{#if mentor.daily_action != null}
-					<CardSubtitle>Daily Action</CardSubtitle>
-					<br />
-					<CardText>{mentor.daily_action}</CardText>
+					<CardSubtitle class="card-subtitle">Daily Action</CardSubtitle>
+					<CardText class="card-text">{mentor.daily_action.action}</CardText>
 				{/if}
+				<div class="card-buttons">
+					<Button
+							class="btn-custom"
+							color="primary"
+							on:click={() => goToCurriculumList(mentor.id)}>학습 방향 관리하기</Button>
+					<Button
+							class="btn-custom"
+							color="secondary"
+							on:click={() => goToActionList(mentor.id)}>Action 관리하기</Button>
+				</div>
 			</CardBody>
 			<CardFooter class="d-flex justify-content-end">
 				<Modal isOpen={open[index]} backdrop={false}>
@@ -145,83 +193,37 @@
 					</ModalBody>
 					<ModalFooter>
 						<Button
-							color="danger"
-							on:click={() => {
+								color="danger"
+								on:click={() => {
 								toggle(index);
 								removeMentor(mentor.id);
-							}}>삭제</Button
-						>
+							}}>삭제</Button>
 						<Button color="secondary" on:click={() => toggle(index)}>취소</Button>
 					</ModalFooter>
 				</Modal>
 				<Button
-					class=""
-					active={false}
-					block={false}
-					children=""
-					close={false}
-					color="danger"
-					disabled={false}
-					href=""
-					outline={false}
-					size="md"
-					style=""
-					on:click={() => (open[index] = true)}
-					value="">삭제</Button
-				>
+						class="btn-custom action-buttons"
+						color="danger"
+						on:click={() => (open[index] = true)}>삭제</Button>
 				<Button
-					class=""
-					active={false}
-					block={false}
-					children=""
-					close={false}
-					color="success"
-					disabled={false}
-					href=""
-					outline={false}
-					size="md"
-					style="margin-left: 10px;"
-					on:click={() => goToEditMentor(mentor.id)}
-					value="">수정</Button
-				>
+						class="btn-custom action-buttons"
+						color="warning"
+						on:click={() => goToEditMentor(mentor.id)}>수정</Button>
 				<Button
-					class=""
-					active={false}
-					block={false}
-					children=""
-					close={false}
-					color="primary"
-					disabled={false}
-					href=""
-					outline={false}
-					size="md"
-					style="margin-left: 10px;"
-					on:click={() => goToChat(mentor.id)}
-					value="">대화하기</Button
-				>
+						class="btn-custom action-buttons"
+						color="success"
+						on:click={() => goToChat(mentor.id)}>대화하기</Button>
 			</CardFooter>
 		</Card>
-		<br />
 	{/each}
 
 	<Container
-		fluid
-		class="d-flex justify-content-end"
-		style="margin-top: 30px; padding-bottom: 30px;"
-	>
+			fluid
+			class="d-flex justify-content-end"
+			style="margin-top: 30px; padding-bottom: 30px;">
 		<Button
-			class=""
-			active={false}
-			block={false}
-			children=""
-			close={false}
-			color="secondary"
-			disabled={false}
-			href=""
-			outline={false}
-			size="md"
-			on:click={() => goToCreateMentor()}
-			value="">멘토 추가하기</Button
-		>
+				class="btn-custom"
+				color="info"
+				on:click={() => goToCreateMentor()}>멘토 추가하기</Button>
 	</Container>
 </Container>

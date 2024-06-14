@@ -46,6 +46,9 @@
 	}
 </script>
 
+<svelte:head>
+	<title>로그인 및 회원가입</title>
+</svelte:head>
 <Container class="vh-100">
 	<Container class="py-5 h-100">
 		<Row class="d-flex justify-content-center align-items-center h-50">

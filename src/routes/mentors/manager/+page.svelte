@@ -206,123 +206,147 @@
 		}
 	}
 </script>
+<svelte:head>
+	{#if id != null}
+		<title>멘토 정보 수정</title>
+	{:else}
+		<title>멘토 생성</title>
+	{/if}
+</svelte:head>
+
+<style>
+	.card-container {
+		max-width: 800px;
+		margin: auto;
+	}
+	.card-header {
+		background-color: #f8f9fa;
+		border-bottom: 1px solid #dee2e6;
+		padding: 20px;
+		border-top-left-radius: 1rem;
+		border-top-right-radius: 1rem;
+	}
+	.card-body {
+		padding: 40px;
+	}
+	.form-group {
+		margin-bottom: 20px;
+	}
+	.section-title {
+		margin-top: 30px;
+		margin-bottom: 20px;
+		font-weight: bold;
+		color: #495057;
+	}
+	.button-container {
+		margin-top: 30px;
+	}
+</style>
 
 <Container class="py-5 h-100">
-	<Row class="d-flex">
-		<Card class="shadow-2-strong" style="border-radius: 1rem; margin-bottom: 30px;">
-			<CardBody class="p-5 text-center">
-				<h3 class="mb-5"><b>{id != null ? '멘토 정보 수정' : '멘토 생성'}</b></h3>
-
+	<Row class="d-flex justify-content-center">
+		<Card class="shadow-2-strong card-container">
+			<div class="card-header text-center">
+				<h3>{id != null ? '멘토 정보 수정' : '나만의 멘토를 생성해보세요'}</h3>
+			</div>
+			<CardBody class="card-body text-center">
 				<Form
-					{validated}
-					action="javascript:void(0);"
-					on:submit={(e) => (id != null ? doUpdate() : doCreate())}
-					method="post"
-					id="authForm"
+						{validated}
+						action="javascript:void(0);"
+						on:submit={(e) => (id != null ? doUpdate() : doCreate())}
+						method="post"
+						id="authForm"
 				>
 					<ul class="list-group list-group-flush">
 						<li class="list-group-item">
-							<FormGroup floating label="멘토 이름" class="form-outline mb-4">
+							<FormGroup floating label="멘토 이름" class="form-group">
 								<Input
-									type="text"
-									name="mentor_name"
-									id="mentor_name"
-									required
-									bind:value={values.mentor_name}
+										type="text"
+										name="mentor_name"
+										id="mentor_name"
+										required
+										bind:value={values.mentor_name}
 								/>
 							</FormGroup>
 
-							<h5 class="" style="margin-top: 20px; margin-bottom: 20px;"><b>분야 선택</b></h5>
-
-							<br />
-							<Input
-								type="checkbox"
-								label="백엔드"
-								id="mentor_field0"
-								bind:checked={values.mentor_field0}
-							/>
-							<br />
-							<Input
-								type="checkbox"
-								label="프론트"
-								id="mentor_field1"
-								bind:checked={values.mentor_field1}
-							/>
-							<br />
+							<h5 class="section-title">분야 선택 (하나만 선택)</h5>
+							<FormGroup class="form-group">
+								<Input
+										type="checkbox"
+										label="백엔드"
+										id="mentor_field0"
+										bind:checked={values.mentor_field0}
+								/>
+								<Input
+										type="checkbox"
+										label="프론트"
+										id="mentor_field1"
+										bind:checked={values.mentor_field1}
+								/>
+							</FormGroup>
 						</li>
 						<li class="list-group-item">
-							<h5 class="" style="margin-top: 20px; margin-bottom: 20px;"><b>STICC</b></h5>
-							<FormGroup floating label="나의 상황을 입력하세요." class="form-outline mb-4">
+							<h5 class="section-title">자세히 작성해주시면 멘토님께 도움이 됩니다.</h5>
+							<FormGroup floating label="[상황] 현재 상황을 설명해 주세요." class="form-group">
 								<Input
-									type="textarea"
-									name="situation"
-									id="situation"
-									required
-									bind:value={values.situation}
+										type="textarea"
+										name="situation"
+										id="situation"
+										required
+										bind:value={values.situation}
 								/>
 							</FormGroup>
 
-							<FormGroup floating label="나의 작업을 입력하세요." class="form-outline mb-4">
-								<Input type="textarea" name="task" id="task" required bind:value={values.task} />
-							</FormGroup>
-
-							<FormGroup
-								floating
-								label="무엇을 하고 싶은지 의도를 입력하세요."
-								class="form-outline mb-4"
-							>
+							<FormGroup floating label="[작업] 수행하고 싶은 작업을 말해 주세요." class="form-group">
 								<Input
-									type="textarea"
-									name="intent"
-									id="intent"
-									required
-									bind:value={values.intent}
+										type="textarea"
+										name="task"
+										id="task"
+										required
+										bind:value={values.task}
 								/>
 							</FormGroup>
 
-							<FormGroup
-								floating
-								label="이것을 할 때 걱정되는 부분을 입력하세요."
-								class="form-outline mb-4"
-							>
+							<FormGroup floating label="[목적] 이 작업의 목적이나 의도를 알려 주세요." class="form-group">
 								<Input
-									type="textarea"
-									name="concern"
-									id="concern"
-									required
-									bind:value={values.concern}
+										type="textarea"
+										name="intent"
+										id="intent"
+										required
+										bind:value={values.intent}
 								/>
 							</FormGroup>
 
-							<FormGroup
-								floating
-								label="이제 도움을 줄텐데 추가로 궁금한 것을 입력하세요."
-								class="form-outline mb-4"
-							>
+							<FormGroup floating label="[걱정] 걱정되는 부분이 있나요? (ex. 최신 자바 문법을 모릅니다.)" class="form-group">
 								<Input
-									type="textarea"
-									name="calibrate"
-									id="calibrate"
-									required
-									bind:value={values.calibrate}
+										type="textarea"
+										name="concern"
+										id="concern"
+										required
+										bind:value={values.concern}
+								/>
+							</FormGroup>
+
+							<FormGroup floating label="[조율] 추가로 알아야 할 사항이나 요청하고 싶은 것이 있다면 말씀해 주세요." class="form-group">
+								<Input
+										type="textarea"
+										name="calibrate"
+										id="calibrate"
+										required
+										bind:value={values.calibrate}
 								/>
 							</FormGroup>
 						</li>
 					</ul>
 
-					<Button
-						class=""
-						active={false}
-						block={true}
-						children="Button"
-						close={false}
-						color="primary"
-						disabled={false}
-						href=""
-						outline={false}
-						size="lg"
-						value="">{id != null ? '수정' : '제출'}</Button
-					>
+					<div class="button-container">
+						<Button
+								class="btn-custom"
+								block={true}
+								color="primary"
+								size="lg"
+								type="submit">{id != null ? '수정' : '제출'}</Button>
+					</div>
 				</Form>
 			</CardBody>
 		</Card>

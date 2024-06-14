@@ -214,36 +214,61 @@
 	{/if}
 </svelte:head>
 
-<style>
-	.card-container {
-		max-width: 800px;
-		margin: auto;
-	}
-	.card-header {
-		background-color: #f8f9fa;
-		border-bottom: 1px solid #dee2e6;
-		padding: 20px;
-		border-top-left-radius: 1rem;
-		border-top-right-radius: 1rem;
-	}
-	.card-body {
-		padding: 40px;
-	}
-	.form-group {
-		margin-bottom: 20px;
-	}
-	.section-title {
-		margin-top: 30px;
-		margin-bottom: 20px;
-		font-weight: bold;
-		color: #495057;
-	}
-	.button-container {
-		margin-top: 30px;
-	}
-</style>
 
 <Container class="py-5 h-100">
+
+	<style>
+		.card-container {
+			max-width: 800px;
+			margin: auto;
+		}
+		.card-header {
+			background-color: #f8f9fa;
+			border-bottom: 1px solid #dee2e6;
+			padding: 20px;
+			border-top-left-radius: 1rem;
+			border-top-right-radius: 1rem;
+		}
+		.card-body {
+			padding: 40px;
+		}
+		.form-group {
+			margin-bottom: 20px;
+		}
+		.section-title {
+			margin-top: 30px;
+			margin-bottom: 20px;
+			font-weight: bold;
+			color: #495057;
+		}
+		.button-container {
+			margin-top: 30px;
+		}
+		.form-group label {
+			display: block;
+			max-width: 100%;
+			white-space: normal;
+			overflow-wrap: break-word;
+		}
+		@media (max-width: 600px) {
+			.card-body {
+				padding: 20px;
+			}
+			.form-group label {
+				font-size: 0.9rem;
+			}
+			.section-title {
+				font-size: 1.1rem;
+			}
+			.button-container {
+				margin-top: 20px;
+			}
+			.form-group input[type="textarea"] {
+				width: 100%;
+				box-sizing: border-box;
+			}
+		}
+	</style>
 	<Row class="d-flex justify-content-center">
 		<Card class="shadow-2-strong card-container">
 			<div class="card-header text-center">

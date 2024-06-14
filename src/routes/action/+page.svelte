@@ -12,6 +12,7 @@
         Container, Form, FormGroup, Input, Modal, ModalBody, ModalFooter, ModalHeader, Row,
     } from '@sveltestrap/sveltestrap';
     import {userData} from "$lib/auth.js";
+    import SvelteMarkdown from "svelte-markdown";
 
     let id = '';
     let userDataValue;
@@ -207,7 +208,7 @@
         }
 
         .recommend-button {
-            background-color: #007bff;
+            background-color: #032952;
             color: white;
             border: none;
             padding: 10px 20px;
@@ -217,7 +218,7 @@
         }
 
         .recommend-button:hover {
-            background-color: #0056b3;
+            background-color: #063467;
         }
 
         .cancel-button {
@@ -238,7 +239,7 @@
     {#each actionList as action}
         <Card style="margin-bottom: 20px;">
             <CardBody style="background-color: {action.is_done === false ? '#f8f9fa' : '#ffffff'}; border: 1px solid #dee2e6; border-radius: 5px;">
-                <CardTitle style="font-weight: bold; margin-bottom: 15px;">{action.action}</CardTitle>
+                <CardTitle style="font-weight: bold; margin-bottom: 15px;"><SvelteMarkdown source={action.action} /></CardTitle>
                 <Form {validated} action="javascript:void(0);" on:submit={(e) => postActionResult(e.submitter.value, action)} method="post">
                     {#if action.is_active === false && action.is_done === false}
                         <Row>
@@ -257,7 +258,7 @@
                     {:else if action.is_active === false && action.is_done === true}
                         <Row>
                             <Col>
-                                <p>{action.feedback}</p>
+                                <p><SvelteMarkdown source={action.feedback} /></p>
                             </Col>
                         </Row>
                     {:else}
@@ -297,7 +298,7 @@
                     <div class="motivation-text">{motivation}</div>
                     <div style="margin-bottom: 20px; margin-top: 30px;">추천 Action 리스트 (하나를 선택하세요.)</div>
                     {#each actionRecommendList as recommendAction}
-                        <Button class="recommend-button" on:click={() => { toggle(); acceptAction(recommendAction); }}>{recommendAction}</Button>
+                        <Button class="recommend-button" on:click={() => { toggle(); acceptAction(recommendAction); }}><SvelteMarkdown source={recommendAction} /></Button>
                     {/each}
                 {/if}
             </ModalBody>

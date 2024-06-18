@@ -7,7 +7,7 @@
 
 <div class="card-chat">
     <Card>
-        <CardHeader>나
+        <CardHeader>
             <CardTitle>나</CardTitle>
         </CardHeader>
         <CardBody>

@@ -20,6 +20,10 @@
 			goto(base + '/auth'); //로그인 페이지로 넘겨줌
 		}
 	};
+
+	if (userDataValue != null) {
+		redirect();
+	}
 </script>
 
 <svelte:head>

@@ -82,6 +82,10 @@
 
         curriculum = json["CURRICULUM"];
         motivation = json["MOTIVATION"];
+
+        // Clear curriculum_phase
+        curriculum_phase = "";
+
         loading = false;
     }
 </script>
@@ -89,7 +93,7 @@
 <Container fluid class="main-container">
     <Container fluid class="button-container">
         <Button class="recommend-button" on:click={generateCurriculum} disabled={loading}>
-            {loading ? '로딩 중...' : '컬리큘럼 다시 추천받기'}
+            {loading ? '로딩 중...' : '커리큘럼 다시 추천받기'}
         </Button>
     </Container>
 
@@ -106,18 +110,17 @@
         </Container>
     {/if}
 
-    {#if curriculum}
+    {#if curriculum_phase}
         <Container fluid class="curriculum-container">
-            <h3>진행중인 컨리큘럼</h3>
-            <SvelteMarkdown source={curriculum} />
+            <h2>현재 학습 현황</h2>
+            <SvelteMarkdown source={curriculum_phase} />
         </Container>
     {/if}
 
-
-    {#if curriculum_phase}
+    {#if curriculum}
         <Container fluid class="curriculum-container">
-            <h3>현재 나의 학습 현황</h3>
-            <SvelteMarkdown source={curriculum_phase} />
+            <h2>진행중인 커리큘럼</h2>
+            <SvelteMarkdown source={curriculum} />
         </Container>
     {/if}
 

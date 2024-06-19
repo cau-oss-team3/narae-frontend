@@ -58,6 +58,7 @@
     let responseToastMessage = writable('It may take some time for the mentor to respond.');
     let messageCount = 0;
     let messageTimer = null;
+    let onExit = false;
 
     const scrollToBottom = (node) => {
         if (node) {
@@ -79,13 +80,14 @@
     onDestroy(() => {
         unsubscribeUserData();
         if (ws) {
+            console.log('Closing WebSocket...');
+            onExit = true;
             ws.close(); // Close WebSocket when component is destroyed
         }
         if (messageTimer) {
             clearInterval(messageTimer);
         }
     });
-
 
     afterUpdate(() => {
         scrollToBottom(element);
@@ -133,7 +135,11 @@
         ws.onclose = () => {
             messagePending.set(false);
             console.log("WebSocket is closed now.");
+            if (onExit)
+                return;
+
             if (reconnectAttempts < maxReconnectAttempts) {
+                console.log("Reconnecting to WebSocket...");
                 let timeout = Math.pow(2, reconnectAttempts) * 1000;  // Exponential backoff
                 setTimeout(connectWebSocket, timeout);
                 reconnectAttempts++;

@@ -248,14 +248,18 @@
                     {#if action.is_active === false && action.is_done === false}
                         <Row>
                             <Col>
-                                <FormGroup floating label="포기한 Action입니다." class="form-outline mb-4">
+                                <FormGroup floating label="포기한 Action입니다" class="form-outline mb-4">
                                     <Input
                                             type="text"
                                             name="input_temp"
                                             required
-                                            style="background-color: #e9ecef; color: #6c757d;"
+                                            class="mb-3"
+                                            style="background-color: #e9ecef; color: #6c757d; cursor: not-allowed;"
                                             disabled
                                     />
+                                    <p>
+                                        <SvelteMarkdown source={action.feedback}/>
+                                    </p>
                                 </FormGroup>
                             </Col>
                         </Row>

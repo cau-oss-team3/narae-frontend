@@ -26,43 +26,24 @@
     const unsubscribeUserData = userData.subscribe((value) => {
         userDataValue = value;
     });
+
     onDestroy(() => {
         unsubscribeUserData
     });
 
     let open = [];
-
     const toggle = (i) => {
         open[i] = !open[i];
     };
 
     let mentors = [];
 
-    //TODO 삭제
-    /*
-    let dummyMentors = [
-        {
-            "id": "mentorid1",
-            "name": "멘토이름",
-            "daily_action": "오늘의 할일 1"
-        },
-        {
-            "id": "mentorid2",
-            "name": "맨토이름 2",
-            "daily_action": "오늘의 할일 2"
-        }
-    ];
-
-     */
-
     onMount(() => {
-        // Initialize fake server
         getMentorList();
     });
 
     // 맨토 리스트 불러오기
     async function getMentorList() {
-        console.log(userData);
         const res = await fetch(PUBLIC_API_SERVER + '/mentors2', {
             method: 'GET',
             headers: {
@@ -76,7 +57,6 @@
         if (json.isSuccess) {
             open = Array.from({length: json.mentors.length}, () => false);
             mentors = json.mentors;
-            console.log(json);
         } else {
             alertData.set({code: res.status, err: json.err});
         }

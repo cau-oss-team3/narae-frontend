@@ -120,7 +120,7 @@
             success: isSuccess,
             comment: input_data
         };
-        const res = await fetch(PUBLIC_API_SERVER + '/prompt/' + id +'/daily-actions/current', {
+        const res = await fetch(PUBLIC_API_SERVER + '/prompt/' + id + '/daily-actions/current', {
             method: 'PATCH',
             headers: {
                 'Content-Type': 'application/json',
@@ -175,8 +175,7 @@
     <title>수락한 Action 리스트</title>
 </svelte:head>
 
-
-<Container fluid>
+<Container fluid class="container-xl">
     <style>
         .modal-body {
             padding: 20px;
@@ -235,11 +234,19 @@
         }
     </style>
 
+    <!-- Put Markdown content here -->
+    <h2 class="mt-3" style="text-align: center; margin-bottom: 20px;">수락한 Action 리스트</h2>
+
+
     {#each actionList as action}
-        <Card style="margin-bottom: 20px;">
-            <CardBody style="background-color: {action.is_done === false ? '#f8f9fa' : '#ffffff'}; border: 1px solid #dee2e6; border-radius: 5px;">
-                <CardTitle style="font-weight: bold; margin-bottom: 15px;"><SvelteMarkdown source={action.action} /></CardTitle>
-                <Form {validated} action="javascript:void(0);" on:submit={(e) => postActionResult(e.submitter.value, action)} method="post">
+        <Card class="mb-3">
+            <CardBody
+                    style="background-color: {action.is_done === false ? '#f8f9fa' : '#ffffff'}; border: 1px solid #dee2e6; border-radius: 5px;">
+                <CardTitle style="font-weight: bold; margin-bottom: 15px;">
+                    <SvelteMarkdown source={action.action}/>
+                </CardTitle>
+                <Form {validated} action="javascript:void(0);"
+                      on:submit={(e) => postActionResult(e.submitter.value, action)} method="post">
                     {#if action.is_active === false && action.is_done === false}
                         <Row>
                             <Col>
@@ -257,7 +264,9 @@
                     {:else if action.is_active === false && action.is_done === true}
                         <Row>
                             <Col>
-                                <p><SvelteMarkdown source={action.feedback} /></p>
+                                <p>
+                                    <SvelteMarkdown source={action.feedback}/>
+                                </p>
                             </Col>
                         </Row>
                     {:else}
@@ -277,8 +286,12 @@
                             {#if actionLoading}
                                 <div class="loading-indicator">처리 중입니다...</div>
                             {:else}
-                                <Button class="action-button" color="danger" on:click={() => postActionResult(input_temp_data, false)}>실패</Button>
-                                <Button class="action-button" color="success" on:click={() => postActionResult(input_temp_data, true)}>완수</Button>
+                                <Button class="action-button" color="danger"
+                                        on:click={() => postActionResult(input_temp_data, false)}>실패
+                                </Button>
+                                <Button class="action-button" color="success"
+                                        on:click={() => postActionResult(input_temp_data, true)}>완수
+                                </Button>
                             {/if}
                         </Container>
                     {/if}
@@ -297,7 +310,9 @@
                     <div class="motivation-text">{motivation}</div>
                     <div style="margin-bottom: 20px; margin-top: 30px;">추천 Action 리스트 (하나를 선택하세요.)</div>
                     {#each actionRecommendList as recommendAction}
-                        <Button class="recommend-button" on:click={() => { toggle(); acceptAction(recommendAction); }}><SvelteMarkdown source={recommendAction} /></Button>
+                        <Button class="recommend-button" on:click={() => { toggle(); acceptAction(recommendAction); }}>
+                            <SvelteMarkdown source={recommendAction}/>
+                        </Button>
                     {/each}
                 {/if}
             </ModalBody>

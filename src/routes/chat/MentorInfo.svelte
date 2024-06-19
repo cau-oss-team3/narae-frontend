@@ -16,17 +16,39 @@
     };
 </script>
 
-
-
 <style>
     .card-chat {
         margin-bottom: 20px;
         margin-left: auto;
         margin-right: auto;
-        border: 1px solid #ccc;
-        border-radius: 8px;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        max-width: 800px;
+        border: none;
+        border-radius: 12px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        max-width: 600px;
+        background-color: #ffffff;
+        overflow: hidden;
+    }
+
+    .card-chat-header {
+        background-color: #007bff;
+        color: white;
+        padding: 15px;
+        text-align: center;
+    }
+
+    .card-chat-title {
+        margin: 0;
+        font-size: 1.5rem;
+    }
+
+    .card-chat-body {
+        padding: 20px;
+    }
+
+    .card-chat-body-text {
+        margin-bottom: 20px;
+        font-size: 1rem;
+        color: #555;
     }
 
     .card-chat-body-div {
@@ -34,59 +56,84 @@
         margin-top: 20px;
     }
 
-    .card-chat-body-div-text-info {
-        font-size: 18px;
+    .card-chat-body-div-subtitle {
+        font-size: 1.2rem;
         font-weight: bold;
         margin-bottom: 10px;
     }
 
+    .card-chat-body-div-text {
+        font-size: 1rem;
+        color: #555;
+    }
+
+    .card-chat-body-div-text-info {
+        font-size: 1rem;
+        font-weight: bold;
+        margin-bottom: 10px;
+        color: #333;
+    }
+
     .card-chat-body-div-text-sticc {
-        font-size: 16px;
+        font-size: 0.9rem;
+        color: #555;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    th, td {
+        padding: 10px;
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+    }
+
+    th {
+        background-color: #f5f5f5;
     }
 </style>
-
 
 <div class="card-chat">
     <Card>
         <CardHeader class="card-chat-header">
             <CardTitle class="card-chat-title">
-                멘토 정보
+                {mentor_detail.mentor_name}
             </CardTitle>
         </CardHeader>
         <CardBody class="card-chat-body">
-            <CardText class="card-chat-body-text">
-                개발에서 어려움이 있다면 말해주세요. <br/>
-                답변 생성이 20초 정도 걸릴 수 있으니 기다려주세요!
-            </CardText>
-
             <div class="card-chat-body-div">
-                <CardSubtitle class="card-chat-body-div-subtitle">멘토 이름: {mentor_detail.mentor_name}</CardSubtitle>
-                <br/>
+                <CardSubtitle class="card-chat-body-div-subtitle">
+                    현재 {fieldCodeToString(mentor_detail.mentor_field)} 분야의 멘토로 활동중입니다.
+                </CardSubtitle>
                 <CardText class="card-chat-body-div-text">
-                    멘토의 분야: {fieldCodeToString(mentor_detail.mentor_field)}
-                    <br/>
-                    <br/>
-                    <div class="card-chat-body-div-text-info">현재 멘토링 중인 정보</div>
-                    <div class="card-chat-body-div-text-sticc">
-                        상황:<br/>
-                        {mentor_detail.mentor_sticc.situation}
-                        <br/><br/>
-                        작업: <br/>
-                        {mentor_detail.mentor_sticc.task}
-                        <br/><br/>
-                        의도: <br/>
-                        {mentor_detail.mentor_sticc.intent}
-                        <br/><br/>
-                        고민: <br/>
-                        {mentor_detail.mentor_sticc.concern}
-                        <br/><br/>
-                        추가 정보: <br/>
-                        {mentor_detail.mentor_sticc.calibrate}
-                        <br/>
-                    </div>
+                    어떤 것을 도와드릴까요?
                 </CardText>
+                멘토링 상세 정보
+                <table class="card-chat-body-div-text-sticc">
+                    <tr>
+                        <th>상황</th>
+                        <td>{mentor_detail.mentor_sticc.situation}</td>
+                    </tr>
+                    <tr>
+                        <th>작업</th>
+                        <td>{mentor_detail.mentor_sticc.task}</td>
+                    </tr>
+                    <tr>
+                        <th>의도</th>
+                        <td>{mentor_detail.mentor_sticc.intent}</td>
+                    </tr>
+                    <tr>
+                        <th>고민</th>
+                        <td>{mentor_detail.mentor_sticc.concern}</td>
+                    </tr>
+                    <tr>
+                        <th>추가 정보</th>
+                        <td>{mentor_detail.mentor_sticc.calibrate}</td>
+                    </tr>
+                </table>
             </div>
         </CardBody>
     </Card>
 </div>
-

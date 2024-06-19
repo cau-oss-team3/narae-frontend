@@ -89,6 +89,13 @@
         }
     };
 
+    // chat history 페이지로 보내기
+    const goToChatHistory = (id) => {
+        if (id != null) {
+            goto(base + '/chat/history?id=' + id); //chat history 페이지로 넘겨줌
+        }
+    };
+
     // mentors - manager 페이지 생성모드로 보내기
     const goToCreateMentor = () => {
         goto(base + '/mentors/manager'); //멘토 매니저 페이지 생성모드로 넘겨줌
@@ -222,18 +229,23 @@
                         </Modal>
                         <Button
                                 class="btn-custom action-buttons"
-                                color="danger"
+                                color="secondary"
                                 on:click={() => (open[index] = true)}>삭제
                         </Button>
                         <Button
                                 class="btn-custom action-buttons"
-                                color="warning"
+                                color="secondary"
                                 on:click={() => goToEditMentor(mentor.id)}>수정
                         </Button>
                         <Button
                                 class="btn-custom action-buttons"
+                                color="secondary"
+                                on:click={() => goToChatHistory(mentor.id)}>이전 대화 기록 보기
+                        </Button>
+                        <Button
+                                class="btn-custom action-buttons"
                                 color="success"
-                                on:click={() => goToChat(mentor.id)}>대화하기
+                                on:click={() => goToChat(mentor.id)}>멘토와 대화하기
                         </Button>
                     </CardFooter>
                 </Card>

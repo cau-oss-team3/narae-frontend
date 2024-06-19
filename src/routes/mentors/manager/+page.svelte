@@ -12,37 +12,36 @@
         Container,
         Form,
         FormGroup,
-        Input, Label,
-        Row
+        Input,
+        Label,
+        Row,
+        Spinner
     } from '@sveltestrap/sveltestrap';
     import {userData} from "$lib/auth.js";
+    import {writable} from "svelte/store";
 
     let userDataValue;
     const unsubscribeUserData = userData.subscribe((value) => {
         userDataValue = value;
     });
     onDestroy(() => {
-        unsubscribeUserData
+        unsubscribeUserData();
     });
 
     let id = '';
+    let loading = writable(false);
 
     onMount(() => {
         id = $page.url.searchParams.get('id');
+        if (id != null) {
+            // 멘토 id가 있는경우 편집 모드
+            getMentor();
+        }
     });
 
     let validated = false;
     let values = {};
 
-    onMount(() => {
-        if (id != null) {
-            // 멘토 id가 있는경우 편집 모드
-            getMentor();
-        }
-        //없는 경우 멘토 추가 모드
-    });
-
-    // 맨토 정보 불러오기
     async function getMentor() {
         const res = await fetch(PUBLIC_API_SERVER + '/mentors2/' + id, {
             method: 'GET',
@@ -94,7 +93,6 @@
         return field;
     };
 
-    // 멘토 생성
     async function doCreate() {
         if (convertToApiField() == null) {
             alert('최소 1가지 이상의 분야를 선택해야합니다!');
@@ -113,6 +111,8 @@
             }
         };
 
+        loading.set(true);
+
         const res = await fetch(PUBLIC_API_SERVER + '/mentors2', {
             method: 'POST',
             headers: {
@@ -122,17 +122,17 @@
             body: JSON.stringify(data)
         });
 
+        loading.set(false);
+
         const json = await res.json();
         if (json.isSuccess) {
             alert('멘토 생성 성공!');
             await goto(base + '/mentors'); //멘토 리스트 페이지로 넘겨줌
-        }
-        if (!json.isSuccess) {
+        } else {
             alertData.set({code: res.status, err: json.err});
         }
     }
 
-    // 멘토 수정
     async function doUpdate() {
         if (convertToApiField() == null) {
             alert('최소 1가지 이상의 분야를 선택해야합니다!');
@@ -151,6 +151,8 @@
             }
         };
 
+        loading.set(true);
+
         const res = await fetch(PUBLIC_API_SERVER + '/mentors2/' + id, {
             method: 'PUT',
             headers: {
@@ -160,14 +162,15 @@
             body: JSON.stringify(data)
         });
 
-        const json = await res.json();
-        if (!json.isSuccess) {
-            alertData.set({code: res.status, err: json.err});
-            return;
-        }
+        loading.set(false);
 
-        alert('멘토 수정 성공!');
-        await goto(base + '/mentors'); //멘토 리스트 페이지로 넘겨줌
+        const json = await res.json();
+        if (json.isSuccess) {
+            alert('멘토 수정 성공!');
+            await goto(base + '/mentors'); //멘토 리스트 페이지로 넘겨줌
+        } else {
+            alertData.set({code: res.status, err: json.err});
+        }
     }
 </script>
 
@@ -354,12 +357,17 @@
                     </ul>
 
                     <div class="button-container">
+                        {#if $loading}
+                            <Spinner color="primary"/>
+                            <span class="sr-only">{id != null ? ' 수정' : ' 생성'}중...</span>
+                        {/if}
                         <Button
                                 class="btn-custom"
                                 block={true}
                                 color="primary"
                                 size="lg"
-                                type="submit">{id != null ? '수정' : '제출'}</Button>
+                                type="submit"
+                                disabled={$loading}>{id != null ? '수정' : '생성'}</Button>
                     </div>
                 </Form>
             </CardBody>

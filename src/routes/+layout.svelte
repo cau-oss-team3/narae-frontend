@@ -1,10 +1,16 @@
 <script>
     import {
+        Alert,
+        Button,
         Collapse,
         Dropdown,
         DropdownItem,
         DropdownMenu,
         DropdownToggle,
+        Modal,
+        ModalBody,
+        ModalFooter,
+        ModalHeader,
         Nav,
         Navbar,
         NavbarBrand,
@@ -21,9 +27,14 @@
     let userDataValue;
     let alertDataValue;
     let isOpen = false;
+    let modalOpen = false;
 
     const toggleNavbar = () => {
         isOpen = !isOpen;
+    };
+
+    const toggleModal = () => {
+        modalOpen = !modalOpen;
     };
 
     const unsubscribeUserData = userData.subscribe((value) => {
@@ -32,7 +43,7 @@
 
     const unsubscribeAlertData = alertData.subscribe((value) => {
         alertDataValue = value;
-        open = alertDataValue != null;
+        modalOpen = alertDataValue != null;
     });
 
     afterNavigate(() => {
@@ -107,5 +118,20 @@
         </Nav>
     </Collapse>
 </Navbar>
+
+<Modal isOpen={modalOpen} toggle={toggleModal}>
+    <ModalHeader toggle={toggleModal}>알림</ModalHeader>
+    <ModalBody>
+        <Alert
+                children={alertDataValue.err}
+                color={alertDataValue.code === 500 ? 'danger' : 'warning'}
+                isOpen
+                fade
+        />
+    </ModalBody>
+    <ModalFooter>
+        <Button color="primary" on:click={toggleModal}>확인</Button>
+    </ModalFooter>
+</Modal>
 
 <slot></slot>

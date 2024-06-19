@@ -175,12 +175,21 @@
                         <CardTitle>{mentor.name}</CardTitle>
                     </CardHeader>
                     <CardBody>
+                        <!-- when action -->
                         {#if mentor.daily_action != null}
-                            <CardSubtitle class="card-subtitle">Daily Action</CardSubtitle>
+                            <CardSubtitle class="card-subtitle">진행 중인 Action</CardSubtitle>
                             <CardText class="card-text">
                                 <SvelteMarkdown source={mentor.daily_action.action}/>
                             </CardText>
                         {/if}
+                        {#if mentor.daily_action == null}
+                            <CardText class="card-text">
+                                <CardSubtitle class="card-subtitle" style="color: #a5a5a5;">
+                                    오늘의 Action이 없습니다. Action을 추가해주세요.
+                                </CardSubtitle>
+                            </CardText>
+                        {/if}
+
                         <div class="card-buttons">
                             <Button
                                     class="btn-custom"

@@ -12,7 +12,7 @@
         Container,
         Form,
         FormGroup,
-        Input,
+        Input, Label,
         Row
     } from '@sveltestrap/sveltestrap';
     import {userData} from "$lib/auth.js";
@@ -163,11 +163,11 @@
         const json = await res.json();
 
         if (json.isSuccess) {
-            goto(base + '/mentors'); //멘토 리스트 페이지로 넘겨줌
+            await goto(base + '/mentors'); //멘토 리스트 페이지로 넘겨줌
             alert('멘토 수정 성공!');
         } else {
             if (res.status === 404) {
-                goto(base + '/mentors'); // 멘토 정보가 없는경우 멘토 리스트 페이지로 넘겨줌
+                await goto(base + '/mentors'); // 멘토 정보가 없는경우 멘토 리스트 페이지로 넘겨줌
                 alert('해당 멘토 정보가 없습니다.');
             } else {
                 alertData.set({code: res.status, err: json.err});
@@ -204,7 +204,24 @@
         }
 
         .form-group {
-            margin-bottom: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            margin-right: 20px;
+        }
+
+        .checkbox-label input {
+            margin-right: 5px;
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 15px;
         }
 
         .section-title {
@@ -216,13 +233,6 @@
 
         .button-container {
             margin-top: 30px;
-        }
-
-        .form-group label {
-            display: block;
-            max-width: 100%;
-            white-space: normal;
-            overflow-wrap: break-word;
         }
 
         @media (max-width: 600px) {
@@ -274,20 +284,24 @@
                                 />
                             </FormGroup>
 
-                            <h5 class="section-title">분야 선택 (하나만 선택)</h5>
+                            <h5 class="section-title">분야 선택</h5>
                             <FormGroup class="form-group">
-                                <Input
-                                        type="checkbox"
-                                        label="백엔드"
-                                        id="mentor_field0"
-                                        bind:checked={values.mentor_field0}
-                                />
-                                <Input
-                                        type="checkbox"
-                                        label="프론트"
-                                        id="mentor_field1"
-                                        bind:checked={values.mentor_field1}
-                                />
+                                <div class="checkbox-label">
+                                    <Input
+                                            type="checkbox"
+                                            id="mentor_field0"
+                                            bind:checked={values.mentor_field0}
+                                    />
+                                    <Label for="mentor_field0">백엔드</Label>
+                                </div>
+                                <div class="checkbox-label">
+                                    <Input
+                                            type="checkbox"
+                                            id="mentor_field1"
+                                            bind:checked={values.mentor_field1}
+                                    />
+                                    <Label for="mentor_field1">프론트</Label>
+                                </div>
                             </FormGroup>
                         </li>
                         <li class="list-group-item">

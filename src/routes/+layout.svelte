@@ -1,16 +1,10 @@
 <script>
     import {
-        Alert,
-        Button,
         Collapse,
         Dropdown,
         DropdownItem,
         DropdownMenu,
         DropdownToggle,
-        Modal,
-        ModalBody,
-        ModalFooter,
-        ModalHeader,
         Nav,
         Navbar,
         NavbarBrand,
@@ -26,12 +20,10 @@
 
     let userDataValue;
     let alertDataValue;
-    let isOpen;
-    let handleUpdate;
-    let open = false;
+    let isOpen = false;
 
-    const toggle = () => {
-        open = !open;
+    const toggleNavbar = () => {
+        isOpen = !isOpen;
     };
 
     const unsubscribeUserData = userData.subscribe((value) => {
@@ -61,57 +53,59 @@
     }
 </script>
 
-<Navbar
-        class=""
-        container="xl"
-        color="light"
-        dark={false}
-        expand="md"
-        fixed=""
-        light
-        sticky=""
-        theme="auto"
->
-    <NavbarBrand href="{base}/">나의 과외 선생님 "나래"</NavbarBrand>
-    <NavbarToggler on:click={() => (isOpen = !isOpen)}/>
-    <Collapse {isOpen} navbar expand="md" on:update={handleUpdate}>
+<svelte:head>
+    <style>
+        .navbar {
+            background: rgba(0, 0, 0, 0.8);
+            padding: 0.4rem 0.8rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .navbar-brand, .nav-link {
+            color: white !important;
+            transition: color 0.3s ease;
+        }
+        .navbar-brand:hover, .nav-link:hover {
+            color: #FFD700 !important;
+        }
+        .dropdown-menu {
+            background-color: rgba(0, 0, 0, 0.8);
+            border: none;
+        }
+        .dropdown-item {
+            color: white !important;
+        }
+        .dropdown-item:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        .navbar-toggler {
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+    </style>
+</svelte:head>
+
+<Navbar class="navbar" expand="md">
+    <NavbarBrand href="{base}/">나의 멘토 "나래"</NavbarBrand>
+    <NavbarToggler on:click={toggleNavbar} class="navbar-toggler"/>
+    <Collapse {isOpen} navbar expand="md">
         <Nav class="ms-auto" navbar>
             <NavItem>
                 <NavLink href="https://github.com/cau-oss-team3">GitHub</NavLink>
             </NavItem>
             <Dropdown nav inNavbar>
-                <DropdownToggle nav caret>계정</DropdownToggle>
-                <DropdownMenu end>
+                <DropdownToggle nav caret class="dropdown-toggle">계정</DropdownToggle>
+                <DropdownMenu end class="dropdown-menu">
                     {#if userDataValue != null}
-                        <DropdownItem>{userDataValue.email}</DropdownItem>
-                        <DropdownItem divider/>
-                        <DropdownItem on:click={() => doLogout()}>Logout</DropdownItem>
+                        <DropdownItem class="dropdown-item">{userDataValue.email}</DropdownItem>
+                        <DropdownItem divider class="dropdown-divider"/>
+                        <DropdownItem class="dropdown-item" on:click={doLogout}>Logout</DropdownItem>
                     {:else}
-                        <DropdownItem href="{base}/auth/">Login</DropdownItem>
+                        <DropdownItem class="dropdown-item" href="{base}/auth/">Login</DropdownItem>
                     {/if}
                 </DropdownMenu>
             </Dropdown>
         </Nav>
     </Collapse>
 </Navbar>
-<Modal isOpen={open} {toggle}>
-    <ModalHeader {toggle}>알림</ModalHeader>
-    <ModalBody>
-        <Alert
-                class=""
-                children={alertDataValue.err}
-                color={alertDataValue.code === 500 ? 'danger' : 'warning'}
-                closeClassName=""
-                closeAriaLabel="Close"
-                dismissible={false}
-                fade
-                isOpen
-                theme="auto"
-        />
-    </ModalBody>
-    <ModalFooter>
-        <Button color="primary" on:click={toggle}>확인</Button>
-    </ModalFooter>
-</Modal>
 
 <slot></slot>

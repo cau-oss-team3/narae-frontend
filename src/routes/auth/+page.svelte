@@ -49,18 +49,17 @@
 <svelte:head>
 	<title>로그인 및 회원가입</title>
 </svelte:head>
-<Container class="vh-100">
+<Container>
 	<Container class="py-5 h-100">
-		<Row class="d-flex justify-content-center align-items-center h-50">
+		<Row class="d-flex justify-content-center align-items-center">
 			<Col class="col-12 col-md-8 col-lg-6 col-xl-5">
 				<Card class="shadow-2-strong" style="border-radius: 1rem;">
 					<CardBody class="p-5 text-center">
-						<h3 class="mb-5"><b>로그인 및 회원가입</b></h3>
-
+						<h3 class="mb-3"><b>로그인 및 회원가입</b></h3>
 						<Form
 							{validated}
 							action="javascript:void(0);"
-							on:submit={(e) => doLogin()}
+							on:submit={() => doLogin()}
 							method="post"
 							id="authForm"
 						>
@@ -100,6 +99,10 @@
 								value="">로그인</Button
 							>
 						</Form>
+					</CardBody>
+					<CardBody class="text-center pb-4 pt-0">
+						<p class="text-muted">계정이 없어도 당황하지 마세요!</p>
+						<p class="text-muted">계정이 없으면 회원가입이 되고 자동 로그인이 되니 앞으로 쓸 계정 정보를 입력하고 로그인 버튼을 눌러주세요.</p>
 					</CardBody>
 				</Card>
 			</Col>

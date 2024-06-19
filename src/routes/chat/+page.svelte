@@ -1,6 +1,5 @@
-<!-- TODO 개발 -->
 <script>
-    import {onDestroy, onMount} from 'svelte';
+    import {afterUpdate, onDestroy, onMount} from 'svelte';
     import {page} from '$app/stores';
     import {PUBLIC_API_SERVER, PUBLIC_WS_SERVER} from '$env/static/public';
     import {alertData} from '../../stores.js';
@@ -19,7 +18,10 @@
         Form,
         FormGroup,
         Input,
-        Row
+        Row,
+        Toast,
+        ToastBody,
+        ToastHeader
     } from '@sveltestrap/sveltestrap';
     import {writable} from "svelte/store";
     import {userData} from "$lib/auth.js";
@@ -32,12 +34,36 @@
     import RequestFeedback from "./RequestFeedback.svelte";
 
     let title = '대화하기';
+
+    // WS 관련 변수
     let id = '';
     let ws = null;
     let userDataValue;
     let tokenReady = false;
     let reconnectAttempts = 0;
     const maxReconnectAttempts = 5;
+
+    // Chat UI 관련 변수
+    let validated = false;
+    let element;
+    let mentor_detail = null;
+    let chat_history = [];
+
+    // Chat Data 관련 변수
+    let input_chat_data = '';
+    let messagePending = writable(false);
+    let showSendLimitToast = writable(false);
+    let showResponseToast = writable(false);
+    let toastLimitExceedMessage = writable('');
+    let responseToastMessage = writable('It may take some time for the mentor to respond.');
+    let messageCount = 0;
+    let messageTimer = null;
+
+    const scrollToBottom = (node) => {
+        if (node) {
+            node.scrollTop = node.scrollHeight;
+        }
+    };
 
     const unsubscribeUserData = userData.subscribe(async (value) => {
         userDataValue = value;
@@ -51,10 +77,18 @@
     });
 
     onDestroy(() => {
-        unsubscribeUserData
+        unsubscribeUserData();
         if (ws) {
             ws.close(); // Close WebSocket when component is destroyed
         }
+        if (messageTimer) {
+            clearInterval(messageTimer);
+        }
+    });
+
+
+    afterUpdate(() => {
+        scrollToBottom(element);
     });
 
     onMount(async () => {
@@ -109,30 +143,10 @@
         };
     }
 
-    let validated = false;
-    let element;
-    let inputChatDisplayValue = '';
-
-    const scrollToBottom = async (node) => {
-        node.scroll({top: node.scrollHeight, behavior: 'smooth'});
-    };
-
-    $: if (chat_history != undefined && chat_history != null && chat_history.length > 0 && element) {
-        console.log('Chat history:', chat_history);
-        if (
-            chat_history[chat_history.length - 1].chat_type > 3 ||
-            (chat_history[chat_history.length - 1].candidates ?? []).length > 0
-        ) {
-            inputChatDisplayValue = 'none';
-        }
-        scrollToBottom(element);
+    $: if (chat_history && chat_history.length > 0) {
+        if (element)
+            scrollToBottom(element);
     }
-
-    let mentor_detail = null;
-    let chat_history = [];
-
-    let input_chat_data = '';
-    let messagePending = writable(false);
 
     // Function to add a new message to the chat
     /**
@@ -147,17 +161,9 @@
      */
     function addMessage(message) {
         chat_history = [...chat_history, message];
+        scrollToBottom(element);
     }
 
-    onMount(() => {
-        if (id == null) {
-            goto(base + '/mentors'); // 멘토 id가 없는 경우 멘토 리스트 페이지로 넘겨줌
-            alert('멘토 ID가 없습니다!');
-            return;
-        }
-
-        getMentor();
-    });
 
     // 맨토 정보 불러오기
     async function getMentor() {
@@ -176,7 +182,7 @@
         });
 
         const json = await res.json();
-        console.log("Mentor Detail:", json);
+        // console.log("Mentor Detail:", json);
 
         if (json.isSuccess) {
             mentor_detail = json.mentor_detail;
@@ -209,7 +215,7 @@
 
         if (json.isSuccess) {
             chat_history[index].visibility = false;
-            inputChatDisplayValue = '';
+            input_chat_data = '';
 
             addMessage(json.chat_data);
         } else {
@@ -239,7 +245,7 @@
 
         if (json.isSuccess) {
             chat_history[index].visibility = false;
-            inputChatDisplayValue = '';
+            input_chat_data = '';
 
             addMessage(json.chat_data);
         } else {
@@ -267,7 +273,7 @@
 
         if (json.isSuccess) {
             chat_history[index].visibility = false;
-            inputChatDisplayValue = '';
+            input_chat_data = '';
 
             addMessage(json.chat_data);
         } else {
@@ -275,9 +281,16 @@
         }
     }
 
-
-
     async function sendMessage() {
+        if (messageCount >= 3) {
+            toastLimitExceedMessage.set('현재 메시지 전송은 1분에 3회까지 가능합니다.');
+            showSendLimitToast.set(true);
+            setTimeout(() => {
+                showSendLimitToast.set(false);
+            }, 3000);
+            return;
+        }
+
         const messageData = {
             chat_type: 0,
             chat_data: input_chat_data
@@ -293,40 +306,140 @@
                 timestamp: new Date().getTime(),
                 visibility: true
             });
-            messagePending.set(true);  // Set pending message to true when sending
-            input_chat_data = ''; // Clear input after sending
+            messagePending.set(true);
+            input_chat_data = '';
+            scrollToBottom(element);
+
+            messageCount++;
+            if (messageCount === 1) {
+                messageTimer = setTimeout(() => {
+                    messageCount = 0;
+                }, 60000);
+            }
+
+            responseToastMessage.set('멘토가 답장하는 데 시간이 걸릴 수 있습니다.');
+            showResponseToast.set(true);
+            setTimeout(() => {
+                showResponseToast.set(false);
+            }, 3000);
         } else {
             console.error('WebSocket is not open.');
         }
     }
+
+    // 이전 대화기록 보기
+    const goToChatHistory = (id) => {
+        if (id != null) {
+            goto(base + '/chat/history?id=' + id);
+        }
+    };
 </script>
 
 <svelte:head>
     <title>{title}</title>
 </svelte:head>
 
-<div id="chat_container" class="container-fluid" style="height: 75vh;">
-    <div class="chat-list" bind:this={element} >
+<div class="container-fluid chat-container">
+    <style>
+        .chat-container {
+            height: calc(100vh - 56px);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chat-list {
+            flex: 1;
+            overflow-y: auto;
+            margin-top: 20px;
+            padding-left: 10px;
+            padding-right: 10px;
+        }
+
+        .button-container {
+            display: flex;
+            justify-content: center;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+
+        .form-container {
+            background-color: white;
+            padding: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            margin-bottom: 0;
+        }
+
+        .align-items-center {
+            align-items: center;
+        }
+
+        .modern-input {
+            height: 3.5rem;
+            padding: 0.75rem 1rem;
+            font-size: 1.25rem;
+            line-height: 1.5;
+            border-radius: 10px;
+            border: 1px solid #ced4da;
+            transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        }
+
+        .modern-input:focus {
+            border-color: #80bdff;
+            box-shadow: 0 0 5px rgba(0, 123, 255, 0.25);
+        }
+
+        .send-button {
+            height: 3.5rem;
+            font-size: 1.25rem;
+            line-height: 1.5;
+            border-radius: 10px;
+            transition: background-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        }
+
+        .send-button:hover {
+            background-color: #0056b3;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .pr-2 {
+            padding-right: 0.5rem;
+        }
+    </style>
+
+    <div bind:this={element} class="chat-list">
+        <div class="button-container">
+            <Button
+                    class="btn-custom action-buttons"
+                    color="success"
+                    on:click={() => goToChatHistory(id)}
+                    style="justify-content: center; margin-bottom: 20px;">
+                이전 대화기록 보기
+            </Button>
+        </div>
         {#each chat_history as message, index}
             {#if message.visibility}
                 {#if message.chat_type == 0} <!-- 사용자 발화 -->
-                    <UserChat message={message} />
+                    <UserChat message={message}/>
                 {:else if message.chat_type == 1} <!-- 멘토 발화 -->
-                    <MentorChat message={message} mentor_detail={mentor_detail} />
+                    <MentorChat message={message} mentor_detail={mentor_detail}/>
                 {:else if message.chat_type == 2} <!-- 멘토 정보 출력 -->
-                    <MentorInfo mentor_detail={mentor_detail} />
+                    <MentorInfo mentor_detail={mentor_detail}/>
                 {:else if message.chat_type == 3} <!-- 이전 대화 요약 -->
-                    <PreviousChat message={message} />
-                {:else if message.chat_type == 4} <!-- Acion 수락요청 -->
-                    <ActionRequestAccept message={message} index={index} onSubmit={acceptAction} />
-                {:else if message.chat_type == 5} <!-- Acion 결과 제출 요청 -->
-                    <ActionRequestResultReport message={message} index={index} onSubmit={postActionResult} />
-                {:else if message.chat_type == 6} <!-- Acion Feedback 요청 -->
-                    <RequestFeedback message={message} feedbackTitle="Action Feedback 요청" index={index} onSubmit={postFeedback} />
+                    <PreviousChat message={message}/>
+                {:else if message.chat_type == 4} <!-- Action 수락요청 -->
+                    <ActionRequestAccept message={message} index={index} onSubmit={acceptAction}/>
+                {:else if message.chat_type == 5} <!-- Action 결과 제출 요청 -->
+                    <ActionRequestResultReport message={message} index={index} onSubmit={postActionResult}/>
+                {:else if message.chat_type == 6} <!-- Action Feedback 요청 -->
+                    <RequestFeedback message={message} feedbackTitle="Action Feedback 요청" index={index}
+                                     onSubmit={postFeedback}/>
                 {:else if message.chat_type == 7} <!-- QnA Feedback 요청 -->
-                    <RequestFeedback message={message} feedbackTitle="QnA Feedback 요청" index={index} onSubmit={postFeedback} />
+                    <RequestFeedback message={message} feedbackTitle="QnA Feedback 요청" index={index}
+                                     onSubmit={postFeedback}/>
                 {:else if message.chat_type == 8} <!-- 학습 방향 Feedback 요청 -->
-                    <RequestFeedback message={message} feedbackTitle="학습 방향 Feedback 요청" index={index} onSubmit={postFeedback} />
+                    <RequestFeedback message={message} feedbackTitle="학습 방향 Feedback 요청" index={index}
+                                     onSubmit={postFeedback}/>
                 {:else}
                     <Card style="margin-right: 20%; margin-bottom: 20px;">
                         <CardHeader>
@@ -350,57 +463,65 @@
         {/each}
     </div>
     <Form
-            {validated}
             action="javascript:void(0);"
-            on:submit={(e) => sendMessage()}
-            method="post"
             id="chatForm"
+            method="post"
+            on:submit={() => sendMessage()}
+            class="form-container"
+            {validated}
     >
-        <Container fluid style="display: {inputChatDisplayValue};">
-            <Row>
-                <Col>
-                    <FormGroup floating label="여기에 어려움을 겪고 있는 내용을 입력하세요." class="form-outline mb-4">
+        <Container fluid style="padding: 0;">
+            <Row noGutters class="align-items-center">
+                <Col sm="10" xs="10" class="pr-2">
+                    <FormGroup class="form-outline mb-0" floating label="여기에 어려움을 겪고 있는 내용을 입력하세요.">
                         <Input
-                                type="text"
-                                name="input_chat"
-                                id="input_chat"
-                                required
                                 bind:value={input_chat_data}
+                                id="input_chat"
+                                name="input_chat"
+                                required
+                                type="text"
+                                class="form-control-lg modern-input"
                         />
                     </FormGroup>
                 </Col>
-                <Col xxs="2" sm="2">
+                <Col sm="2" xs="2">
                     <Button
-                            class=""
                             block={true}
                             color="primary"
                             size="lg"
-                    >전송</Button>
+                            class="send-button modern-button"
+                            style="margin-bottom: 16px;"
+                    >전송
+                    </Button>
                 </Col>
             </Row>
-            {#if $messagePending}
-                <div style="text-align: center; color: red;">
-                    응답 생성 중입니다. 잠시만 기다려 주세요!
-                </div>
-            {/if}
         </Container>
     </Form>
+
+    {#if $showSendLimitToast}
+        <Toast isOpen={$showSendLimitToast}
+               style="position: fixed; bottom: 50%; left: 50%; transform: translate(-50%, 50%); width: 300px; z-index: 1050; font-size: 1.2em;">
+            <ToastHeader toggle={() => showSendLimitToast.set(false)}>
+                알림
+            </ToastHeader>
+            <ToastBody style="text-align: center;">
+                {$toastLimitExceedMessage}
+            </ToastBody>
+        </Toast>
+    {/if}
+
+    {#if $showResponseToast}
+        <Toast isOpen={$showResponseToast}
+               style="position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); width: 300px; z-index: 1050; background-color: #343a40; color: #fff; border-radius: 8px; padding: 10px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);">
+            <ToastHeader style="background-color: #343a40; color: #fff; border-bottom: none;">
+                알림
+            </ToastHeader>
+            <ToastBody style="text-align: center;">
+                {$responseToastMessage}
+            </ToastBody>
+        </Toast>
+    {/if}
 </div>
-
-<style>
-    .chat-list {
-        height: 100%;
-        overflow-y: scroll;
-        margin-top: 20px;
-        padding-bottom: 200px;
-        padding-left: 10px;
-        padding-right: 10px;
-    }
-
-    :global(.action-button) {
-        margin-right: 10px;
-    }
-</style>
 
 <!-- TODO 테스트 데이터
 let mentor_detail = {

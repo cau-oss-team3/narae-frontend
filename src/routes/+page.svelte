@@ -29,6 +29,7 @@
 <svelte:head>
 	<title>Narae: Your Personal AI Mentor</title>
 </svelte:head>
+
 <Container class="py-5 text-center container-fluid">
 	<h1 class="container">Narae: Your Personal AI Mentor</h1>
 

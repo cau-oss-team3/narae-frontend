@@ -234,9 +234,7 @@
         }
     </style>
 
-    <!-- Put Markdown content here -->
     <h2 class="mt-3" style="text-align: center; margin-bottom: 20px;">수락한 Action 리스트</h2>
-
 
     {#each actionList as action}
         <Card class="mb-3">

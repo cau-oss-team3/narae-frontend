@@ -114,8 +114,6 @@
 
         // truncate "Bearer " from the start of the token
         const token = userDataValue.token.split(' ')[1];
-        console.log('Connecting to WebSocket with token:', token);
-
         ws = new WebSocket(`${PUBLIC_WS_SERVER}/chat/${id}?token=${token}`);
         ws.onopen = function () {
             console.log("Connected to the WebSocket.");
@@ -188,12 +186,9 @@
         });
 
         const json = await res.json();
-        // console.log("Mentor Detail:", json);
 
         if (json.isSuccess) {
             mentor_detail = json.mentor_detail;
-            chat_history = json.chat_history;
-
             title = '대화하기 > ' + mentor_detail.mentor_name;
         } else {
             alertData.set({code: res.status, err: json.err});
